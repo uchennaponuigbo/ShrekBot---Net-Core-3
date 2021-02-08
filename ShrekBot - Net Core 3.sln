@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShrekBot - Net Core 3", "ShrekBot - Net Core 3\ShrekBot - Net Core 3.csproj", "{25739BA0-0FC0-4543-B57A-60E68B08A852}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25739BA0-0FC0-4543-B57A-60E68B08A852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25739BA0-0FC0-4543-B57A-60E68B08A852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25739BA0-0FC0-4543-B57A-60E68B08A852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25739BA0-0FC0-4543-B57A-60E68B08A852}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13D6A898-26D8-4235-B647-B18AE1EF9196}
+	EndGlobalSection
+EndGlobal
