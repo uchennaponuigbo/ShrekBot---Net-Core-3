@@ -12,20 +12,32 @@ namespace ShrekBot.Modules
         [Summary("Don't anger the orge.")]
         public async Task SwampYell()
         {
-            var anger = new Emoji("\uD83D\uDCA2");
             //await Task.Delay(100);
             using (Context.Channel.EnterTypingState())
             {
-                await ReplyAsync($"{anger}{JSONUtilities.GetAlert("swamp")}{anger}");
+                ShrekMessage swamp = new ShrekMessage(true);
+                await ReplyAsync($"{swamp.GetValue("1")}");
             }            
         }
+
+        [Command("donkey")]
+        public async Task DonkeyYell()
+        {   
+            using(Context.Channel.EnterTypingState())
+            {
+                ShrekMessage swamp = new ShrekMessage(true);
+                await ReplyAsync($"{swamp.GetValue("2")}");
+            }
+        }
+
         [Command("exit")]
         [RequireOwner]
         [RequireContext(ContextType.Guild, ErrorMessage = "Shut down command cannot be used in Direct Messages.")]
         public async Task ExitAsync()
         {
-            string s = $"Initiating shut down command from the guild, {Context.Guild.Name}, in the text channel {Context.Channel.Name}. {DateTime.Now.ToString()}";
-            IDMChannel dmChannel = await Context.User.GetOrCreateDMChannelAsync();            
+            string s = $"Initiating shut down command from the guild, {Context.Guild.Name}, in the text channel " +
+                $"{Context.Channel.Name}. {DateTime.Now}";
+            IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();            
             await dmChannel.SendMessageAsync(s);            
             Environment.Exit(0);
         }
