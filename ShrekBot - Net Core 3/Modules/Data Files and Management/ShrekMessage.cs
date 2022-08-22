@@ -17,5 +17,11 @@
             var Anger = new Discord.Emoji("\uD83D\uDCA2");
             return $"{Anger}{base.GetValue(key)}{Anger}";
         }
+
+        public void AddQuote(string value)
+        {
+            pairs.Add($"{pairs.Count + 1}", value);
+            SaveDataToFile();
+        }
     }
 }

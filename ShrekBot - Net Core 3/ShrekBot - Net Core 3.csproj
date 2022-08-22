@@ -2,18 +2,23 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>ShrekBot</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modules\Data Files and Management\JSONUtilities.cs" />
-    <Compile Remove="Modules\Swamp\PlayAudio.cs" />
+    <Compile Remove="bin\Debug\net6.0\**" />
+    <EmbeddedResource Remove="bin\Debug\net6.0\**" />
+    <None Remove="bin\Debug\net6.0\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin\Debug\netcoreapp3.1\music.json" />
-    <Content Include="bin\Debug\netcoreapp3.1\quotes.json" />
+    <Compile Remove="Modules\Data Files and Management\JSONUtilities.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\music.json" />
+    <Content Include="bin\Debug\quotes.json" />
     <Content Include="bin\Debug\netcoreapp3.1\shrekbotconfig.json" />
   </ItemGroup>
 
@@ -22,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Discord.InteractivityAddon" Version="2.4.0" />
     <PackageReference Include="Discord.Net" Version="3.6.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

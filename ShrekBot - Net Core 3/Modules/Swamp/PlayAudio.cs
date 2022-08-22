@@ -1,129 +1,53 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using ShrekBot.Modules.Data_Files_and_Management;
-using Victoria;
-using Victoria.Enums;
 
 namespace ShrekBot.Modules.Swamp
 {
-    public class PlayAudio : ModuleBase<SocketCommandContext> //ICommandContext
+    public class PlayAudio : ModuleBase<SocketCommandContext> 
     {
-        //public AudioService Audio { get; set; } //dependency injection
-        private readonly LavaNode _lavaNode;
-        private const string JoinVC = "Donkey!! Get in a voice channel!";
-        private const string PlayWhileInVC = "I ain't playing a track without you here, Donkey!";
-
-        public PlayAudio(LavaNode lavaNode)
+        private readonly AudioService _audio;
+        public PlayAudio(AudioService audio)
         {
-            _lavaNode = lavaNode;  //null, find a fix
+            _audio = audio;
         }
 
-        private async Task PlaySong(string query)
-        {
-            var searchResponse = await _lavaNode.SearchYouTubeAsync(query);
-            if (searchResponse.LoadStatus == LoadStatus.LoadFailed ||
-                 searchResponse.LoadStatus == LoadStatus.NoMatches)
-            {
-                await ReplyAsync($"Donkey! Where is the mixtape for `{query}`!?");
-                return;
-            }
-
-            var player = _lavaNode.GetPlayer(Context.Guild);
-            if (player.PlayerState == PlayerState.Playing)
-            {
-                await ReplyAsync("DONKEY!! LET ME FINISH THIS SONG!!");
-                return;
-            }
-            else
-            {
-                var track = searchResponse.Tracks[0];
-                await player.PlayAsync(track);
-                await ReplyAsync($"Start playing {track.Title}, Donkey!");
-            }
-        }
-
-        [Command("join")] [RequireOwner]
+        [Command("join", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
-        [RequireBotPermission(GuildPermission.Connect, ErrorMessage = "Unable to Join!!")]
-        [RequireUserPermission(GuildPermission.Connect, ErrorMessage = "Cannot Join!")]
-        public async Task Join()
+        public async Task JoinVCAsync(IVoiceChannel channel = null)
         {
-            if (_lavaNode.HasPlayer(Context.Guild))
-            {
-                await ReplyAsync("Donkey!! I'm already connected to a voice channel!");
-                return;
-            }
-
-            var voiceState = Context.User as IVoiceState;
-            if (voiceState?.VoiceChannel == null)
-            {
-                await ReplyAsync(JoinVC);
-                return;
-            }
-
-            try
-            {               
-                await _lavaNode.JoinAsync(voiceState.VoiceChannel, Context.Channel as ITextChannel);
-                await ReplyAsync($"I'm at {voiceState.VoiceChannel.Name}, Donkey!");
-            }
-            catch (Exception exception)
-            {
-                await ReplyAsync(exception.Message);
-            }
+            await _audio.ConnecttoVC(Context);        
         }
 
-        [Command("leave")]
+        [Command("leave", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
-        public async Task Leave()
+        public async Task LeaveVCAsync(IVoiceChannel channel = null)
         {
-            //"How do you leave a place that you were never at, Donkey!?"
-            if (!_lavaNode.HasPlayer(Context.Guild))
-            {
-                await ReplyAsync("How do you leave a place that you were never at, Donkey!?");
-                return;
-            }
-            var voiceState = Context.User as IVoiceState;
-            if (voiceState?.VoiceChannel == null)
-            {
-                await ReplyAsync("You're not in the swamp yourself!");
-                return;
-            }
-            
+            await _audio.Leave(Context, true);
 
-            //await ReplyAsync("You can't tell me to leave if you aren't even with me!");
-            await ReplyAsync("Fine! I'm leaving!");
-            await _lavaNode.LeaveAsync(voiceState.VoiceChannel);
         }
 
-        [Command("shrek")]
+        [Command("shrek", RunMode = RunMode.Async)]
         [Alias("all", "star", "allstar")]
         [RequireContext(ContextType.Guild)]
+        [RequireOwner] //for now...
         [Summary("Shrek's Theme. (It could take a few seconds for the song to play)")]
-        public async Task PlayAllStar() 
+        public async Task PlayAllStarAsync(IVoiceChannel channel = null)
         {
-            if (!_lavaNode.HasPlayer(Context.Guild))
-            {
-                await ReplyAsync(PlayWhileInVC);
-                return;
-            }
-            await PlaySong(JSONUtilities.GetAlert("allstar"));
-            
+            ShrekSongs song = new ShrekSongs();
+            await _audio.ConnectAndPlay(Context, song.GetValue("allstar"));  
         }
 
-        [Command("shrek2")]
-        [RequireContext(ContextType.Guild)]
+        [Command("shrek2", RunMode = RunMode.Async)]
         [Alias("hero")]
-        [Summary("Infamous song in Shrek 2. (It could take a few seconds for the song to play)")]
-        public async Task PlayHero()
+        [RequireContext(ContextType.Guild)]
+        [RequireOwner] //for now...
+        [Summary("I need a Hero. (It could take a few seconds for the song to play)")]
+        public async Task PlayHeroAsync(IVoiceChannel channel = null)
         {
-            if (!_lavaNode.HasPlayer(Context.Guild))
-            {
-                await ReplyAsync(PlayWhileInVC);
-                return;
-            }
-            await PlaySong(JSONUtilities.GetAlert("hero"));
+            ShrekSongs song = new ShrekSongs();
+            await _audio.ConnectAndPlay(Context, song.GetValue("hero"));
         }
     }
 }

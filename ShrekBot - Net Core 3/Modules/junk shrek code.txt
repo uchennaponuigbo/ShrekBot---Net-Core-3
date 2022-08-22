@@ -191,3 +191,427 @@ namespace ShrekBot.Modules.Swamp
         }
     }
 }
+
+
+________________________________________________________________________________
+
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Audio;
+using Discord.Commands;
+using Discord.WebSocket;
+using ShrekBot.Modules.Data_Files_and_Management;
+//using Victoria;
+//using Victoria.Enums;
+
+namespace ShrekBot.Modules.Swamp
+{
+    public class PlayAudio : ModuleBase<SocketCommandContext> //ICommandContext
+    {
+        //private readonly AudioService _audio;
+        
+        //private readonly LavaNode _lavaNode;
+        //private const string JoinVC = "Donkey!! Get in a voice channel!";
+        //    private const string PlayWhileInVC = "I ain't playing a track without you here, Donkey!";
+
+        //private const string BotAlreadyConnected = "Donkey!! I'm already connected to a voice channel!";
+        //private const string UserNotConnected = "Donkey, you fool! You're not even in a voice channel!";
+
+        private readonly AudioService _audio;
+        public PlayAudio(AudioService audio)
+        {
+            _audio = audio;
+        }
+
+        //public PlayAudio(LavaNode lavaNode/*, AudioService audioService*/)
+        //{
+        //    _lavaNode = lavaNode;
+        //    //_audio = audioService;
+        //}
+
+        //    private async Task PlaySong(string query)
+        //    {
+        //        var searchResponse = await _lavaNode.SearchYouTubeAsync(query);
+        //        if (searchResponse.LoadStatus == LoadStatus.LoadFailed ||
+        //             searchResponse.LoadStatus == LoadStatus.NoMatches)
+        //        {
+        //            await ReplyAsync($"Donkey! Where is the mixtape for `{query}`!?");
+        //            return;
+        //        }
+
+        //        var player = _lavaNode.GetPlayer(Context.Guild);
+        //        if (player.PlayerState == PlayerState.Playing)
+        //        {
+        //            await ReplyAsync("DONKEY!! LET ME FINISH THIS SONG!!");
+        //            return;
+        //        }
+        //        else
+        //        {
+        //            var track = searchResponse.Tracks[0];
+        //            await player.PlayAsync(track);
+        //            await ReplyAsync($"Start playing {track.Title}, Donkey!");
+        //        }
+        //    }
+
+        [Command("join", RunMode = RunMode.Async)]
+        [RequireContext(ContextType.Guild)]
+        //[RequireBotPermission(GuildPermission.Connect, ErrorMessage = "Unable to Join!!")]
+        //[RequireUserPermission(GuildPermission.Connect, ErrorMessage = "Cannot Join a channel that you don't have permission to join!")]
+        public async Task JoinVCAsync(IVoiceChannel channel = null)
+        {
+            await _audio.ConnecttoVC(Context);
+            // Get the audio channel
+            //channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
+            //if (channel == null) 
+            //{ 
+            //    await Context.Channel.SendMessageAsync(JoinVC); 
+            //    return; 
+            //}
+
+            //SocketGuildUser user = Context.User as SocketGuildUser;
+            //if (user.VoiceChannel != null)
+            //{
+            //    //Check the VoiceChannel property of the SocketGuild CurrentUser. If it's null, the bot is not connected
+            //    var audioClient = await channel.ConnectAsync();
+            //    // For the next step with transmitting audio, you would want to pass this Audio Client in to a service.
+            //}
+            //else
+            //    await ReplyAsync("Donkey! I'm already here with you!");
+
+
+
+            //if (_lavaNode.HasPlayer(Context.Guild))
+            //{
+            //    await ReplyAsync(BotAlreadyConnected);
+            //    return;
+            //}
+
+            //var voiceState = Context.User as IVoiceState;
+            //if (voiceState?.VoiceChannel == null)
+            //{
+            //    await ReplyAsync(UserNotConnected);
+            //    return;
+            //}
+            //Console.WriteLine(Context.Client.ToString());
+
+            //try
+            //{
+            //    await _lavaNode.JoinAsync(voiceState.VoiceChannel, Context.Channel as ITextChannel);
+            //    await ReplyAsync($"I'm now at {voiceState.VoiceChannel.Name}, Donkey!");
+            //}
+            //catch (Exception exception)
+            //{
+            //    EmbedBuilder build = new EmbedBuilder()
+            //    {
+            //        Description = exception.Message,
+            //        Color = Color.DarkMagenta
+            //    };
+            //    await ReplyAsync($"Uhh... this is too techincal for me, Donkey.\n\n", false, build.Build());
+            //}
+        }
+
+        [Command("leave", RunMode = RunMode.Async)]
+        [RequireContext(ContextType.Guild)]
+        public async Task LeaveVCAsync(IVoiceChannel channel = null)
+        {
+            await _audio.Leave(Context, true);
+
+            //channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
+            //SocketGuildUser user = Context.User as SocketGuildUser;
+            //await channel.DisconnectAsync();
+
+
+            //if (!_lavaNode.HasPlayer(Context.Guild))
+            //{
+            //    await ReplyAsync("How do you leave a place that you were never at, Donkey!?");
+            //    return;
+            //}
+            //var voiceState = Context.User as IVoiceState;
+            //if (voiceState?.VoiceChannel == null)
+            //{
+            //    await ReplyAsync("You're not even in the channel yourself!");
+            //    return;
+            //}
+
+            //try
+            //{
+            //    await ReplyAsync("Fine! I'm leaving!");
+            //    await _lavaNode.LeaveAsync(voiceState.VoiceChannel);
+            //}
+            //catch(Exception exception)
+            //{
+            //    await ReplyAsync($"Uhh... this is too techincal for me, Donkey.\n\n{exception.Message}");
+            //}
+
+        }
+
+        [Command("shrek", RunMode = RunMode.Async)]
+        [Alias("all", "star", "allstar")]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Shrek's Theme. (It could take a few seconds for the song to play)")]
+        public async Task PlayAllStarAsync(IVoiceChannel channel = null)
+        {
+            ShrekSongs song = new ShrekSongs();
+            await _audio.ConnectAndPlay(Context, song.GetValue("allstar"));
+            //channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
+            //
+            //await SendAsync(, song.GetValue("allstar"));
+            //await channel.DisconnectAsync();
+            //if the bot is not connected
+            //if (!_lavaNode.HasPlayer(Context.Guild))
+            //{
+            //    try
+            //    {
+            //        var voiceState = Context.User as IVoiceState;
+            //        await _lavaNode.JoinAsync(voiceState.VoiceChannel, Context.Channel as ITextChannel);
+            //        await ReplyAsync($"I'm now at {voiceState.VoiceChannel.Name}, Donkey!");
+            //    }
+            //    catch (Exception exception)
+            //    {
+            //        await ReplyAsync($"Uhh... this is too techincal for me, Donkey.\n\n{exception.Message}");
+            //        return;
+            //    }
+            //}
+
+            //var player = _lavaNode.GetPlayer(Context.Guild);
+
+            //if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
+            //{
+            //    //let shrek finish
+            //    await ReplyAsync("Donkey! Shut up and let me finish!");
+            //}
+            //else
+            //{
+            //    ShrekSongs song = new ShrekSongs();
+            //    var searchResponse = await _lavaNode.SearchAsync
+            //        (Victoria.Responses.Search.SearchType.YouTube, song.GetValue(song.GetValue("allstar")));
+
+            //    //Action<PlayArgs> args = new Action<PlayArgs>()
+            //    await player.PlayAsync();
+            //    await ReplyAsync($"Now Playing");
+            //}
+
+        }
+
+        [Command("shrek2", RunMode = RunMode.Async)]
+        [Alias("hero")]
+        [RequireContext(ContextType.Guild)]
+        [Summary("I need a Hero. (It could take a few seconds for the song to play)")]
+        public async Task PlayHeroAsync(IVoiceChannel channel = null)
+        {
+            ShrekSongs song = new ShrekSongs();
+            await _audio.ConnectAndPlay(Context, song.GetValue("hero"));
+        }
+
+
+        //    [Command("shrek2")]
+        //    [RequireContext(ContextType.Guild)]
+        //    [Alias("hero")]
+        //    [Summary("Infamous song in Shrek 2. (It could take a few seconds for the song to play)")]
+        //    public async Task PlayHero()
+        //    {
+        //        if (!_lavaNode.HasPlayer(Context.Guild))
+        //        {
+        //            await ReplyAsync(PlayWhileInVC);
+        //            return;
+        //        }
+        //        await PlaySong(JSONUtilities.GetAlert("hero"));
+        //    }
+        //private async Task SendAsync(IAudioClient client, string path)
+        //{
+        //    // Create FFmpeg using the previous example
+        //    using (var ffmpeg = CreateStream(path))
+        //    using (var output = ffmpeg.StandardOutput.BaseStream)
+        //    using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
+        //    {
+        //        try { await output.CopyToAsync(discord); }
+        //        catch(Exception ex) { Console.WriteLine(ex.Message); }
+        //        finally { await discord.FlushAsync(); }
+        //    }
+        //}
+
+        //private Process CreateStream(string path)
+        //{
+        //    return Process.Start(new ProcessStartInfo
+        //    {
+        //        FileName = "ffmpeg",
+        //        Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+        //        UseShellExecute = false,
+        //        RedirectStandardOutput = true,
+        //    });
+        //}      
+    }
+}
+
+___________________
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+
+namespace ShrekBot.Modules.Swamp
+{
+    public class HelpModule : ModuleBase
+    {
+        private readonly CommandService _commands;
+        private readonly IServiceProvider _map;
+        private readonly string conditionName = nameof(RequireOwnerAttribute);
+
+        public HelpModule(IServiceProvider map, CommandService commands)
+        {
+            _commands = commands;
+            _map = map;
+        }
+
+        private static string GetPrefix() => $"`{Configuration.Config.bot.Prefix}`";
+
+
+        [Command("helpall", RunMode = RunMode.Async)]
+        public async Task HelpAll()
+        {
+            EmbedBuilder output = new EmbedBuilder();
+            foreach (var mod in _commands.Modules.Where(m => m.Parent == null))
+            {
+                //Get module name
+                //list commands in module
+                //AddHelp(mod, ref output);
+            }
+        }
+
+        [Command("help", RunMode = RunMode.Async)]
+        [Summary("Lists this bot's commands.")]
+        public async Task Help(string path = "")
+        {
+            EmbedBuilder output = new EmbedBuilder();
+            if (path == "")
+            {
+                output.Title = "Shrek - help";
+
+                foreach (var mod in _commands.Modules.Where(m => m.Parent == null))
+                {
+                    //if(mod.Name == "Misc" || mod.Name == "ScheduleMessage")
+                    //bool ownerOnly = false;
+                    //foreach(var condition in mod.Preconditions)
+                    //{
+                    //    if (nameof(condition) == conditionName) //ignoring owner only requirements
+                    //    {
+                    //        ownerOnly = true;
+                    //        break;
+                    //    }
+
+
+                    //}
+                    //if(!ownerOnly)
+                    if (mod.Name == "ScheduleMessage")
+                        continue;
+                    else
+                        AddHelp(mod, ref output);
+                }
+                
+                output.Footer = new EmbedFooterBuilder
+                {
+                    Text = "Use '?help <module>' to get help with a module. Module names are Case Insensitive."
+                };
+            }
+            else
+            {
+                var mod = _commands.Modules.FirstOrDefault(m => m.Name.Replace("Module", "").ToLower() == path.ToLower());
+                if (mod == null) 
+                { 
+                    await ReplyAsync("No module could be found with that name."); 
+                    return; 
+                }
+
+                output.Title = mod.Name;
+                output.Description = $"{mod.Summary}\n" +
+                (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
+                (mod.Aliases.Any() ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n" : "") +
+                (mod.Submodules.Any() ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n" : "") + " ";
+                AddCommands(mod, ref output);
+            }
+
+            await ReplyAsync("", embed: output.Build());
+        }
+
+        public void AddHelp(ModuleInfo module, ref EmbedBuilder builder)
+        {
+            foreach (var sub in module.Submodules)
+            {
+                //bool ownerOnly = false;
+                //foreach(var condition in sub.Attributes)
+                //{
+                //    if (nameof(condition) == conditionName)
+                //        ownerOnly = true;
+                //    break;
+                //}
+                //if(!ownerOnly)
+                if (sub.Name == "quote")
+                    continue;
+                else
+                    AddHelp(sub, ref builder);
+            }
+            //var commands = module.Commands.Select(x => x.Name != "exit");
+            //var commands = module.Commands.Select(x => x.Name != "exit" ? x.Name : "");
+            //string listString = string.Join(", ", $"`{commands}`");
+            builder.AddField(f =>
+            {
+                f.Name = $"**{module.Name}**";
+                //f.Value = $"Submodules: {string.Join(", ", module.Submodules.Select(m => m.Name))}" +
+                //$"\n" +
+                f.Value = /*"Commands: " + listString;*/$"Commands: {string.Join(", ", module.Commands.Select(x => $"`{(x.Name != "exit" ? x.Name : "")}`"))}";
+            });
+        }
+
+        public void AddCommands(ModuleInfo module, ref EmbedBuilder builder)
+        {
+            foreach (var command in module.Commands)
+            {
+                command.CheckPreconditionsAsync(Context, _map).GetAwaiter().GetResult();
+                AddCommand(command, ref builder);
+            }
+
+        }
+
+        public void AddCommand(CommandInfo command, ref EmbedBuilder builder)
+        {
+            foreach(var condition in command.Preconditions)
+            {
+                if (nameof(condition) == conditionName)
+                    return;
+            }
+            builder.AddField(f =>
+            {
+                f.Name = $"**{command.Name}**";
+                f.Value = $"{command.Summary}\n" +
+                (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") +
+                (command.Aliases.Any() ? $"**Aliases:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n" : "") +
+                $"**Usage:** `{GetPrefix()} {GetAliases(command)}`";
+            });
+        }
+
+        public string GetAliases(CommandInfo command)
+        {
+            StringBuilder output = new StringBuilder();
+            if (!command.Parameters.Any()) 
+                return output.ToString();
+            foreach (var param in command.Parameters)
+            {
+                if (param.IsOptional)
+                    output.Append($"[{param.Name} = {param.DefaultValue}] ");
+                else if (param.IsMultiple)
+                    output.Append($"|{param.Name}| ");
+                else if (param.IsRemainder)
+                    output.Append($"...{param.Name} ");
+                else
+                    output.Append($"<{param.Name}> ");
+            }
+            return output.ToString();
+        }
+    }
+}
