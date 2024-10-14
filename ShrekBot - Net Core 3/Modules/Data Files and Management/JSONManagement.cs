@@ -45,21 +45,28 @@ namespace ShrekBot.Modules.Data_Files_and_Management
             pairs = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         }
 
-        protected string GetKeys()
+        protected string GetKeysAsString()
+        {
+            string[] keys = GetKeys().ToArray();
+
+            string keyList = "";
+            foreach (var item in keys)
+                keyList += item + "\n";
+
+            return keyList.TrimEnd('\r', '\n');
+        }
+
+        protected IList<string> GetKeys()
         {
             IList<string> keys;
             using (StreamReader sr = File.OpenText(filePath))
             using (JsonTextReader reader = new JsonTextReader(sr))
             {
                 JObject json = (JObject)JToken.ReadFrom(reader);
-                keys = json.Properties().Select(p => p.Name).ToList();               
+                keys = json.Properties().Select(p => p.Name).ToList();
             }
 
-            string keyList = "";
-            foreach (var item in keys)
-                keyList += item + "\n";
-
-            return keyList;
+            return keys;
         }
         //check if file exists on public methods, to remove the validation in the command classes in case of error
         public bool DoesKeyExist(string key) 

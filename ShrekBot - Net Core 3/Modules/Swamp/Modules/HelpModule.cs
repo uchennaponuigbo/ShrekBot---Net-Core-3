@@ -3,7 +3,7 @@ using Discord;
 using Discord.Commands;
 using ShrekBot.Modules.Data_Files_and_Management;
 
-namespace ShrekBot.Modules.Swamp
+namespace ShrekBot.Modules.Swamp.Modules
 {
     public class HelpModule : ModuleBase<SocketCommandContext>
     {
@@ -47,7 +47,7 @@ namespace ShrekBot.Modules.Swamp
                 build.Description = TextFile.CompactCommands();
                 IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();
                 await dmChannel.SendMessageAsync("", false, build.Build());
-                
+
             }
         }
     }

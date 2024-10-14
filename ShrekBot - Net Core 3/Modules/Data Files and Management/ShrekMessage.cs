@@ -14,7 +14,7 @@
             if (!AddEmoji)
                 return base.GetValue(key);
          
-            var Anger = new Discord.Emoji("\uD83D\uDCA2");
+            Discord.Emoji Anger = new Discord.Emoji("\uD83D\uDCA2");
             return $"{Anger}{base.GetValue(key)}{Anger}";
         }
 

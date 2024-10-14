@@ -5,10 +5,17 @@ using Discord.Commands;
 using ShrekBot.Modules.Data_Files_and_Management;
 using Interactivity;
 
-namespace ShrekBot.Modules
+namespace ShrekBot.Modules.Swamp.Modules
 {
-    public class Misc : ModuleBase<SocketCommandContext>
+    public class MiscModule : ModuleBase<SocketCommandContext>
     {
+        //[Command("test")]
+        //public async Task Test(string keyword)
+        //{
+        //    ShrekGIFs gifs = new ShrekGIFs();
+        //    await ReplyAsync(gifs.GetValue("shrek"));
+        //}
+
         [Command("swamp")]
         [Summary("Don't anger the orge.")]
         public async Task SwampYell()
@@ -18,14 +25,14 @@ namespace ShrekBot.Modules
             {
                 ShrekMessage swamp = new ShrekMessage(true);
                 await ReplyAsync($"{swamp.GetValue("1")}");
-            }            
+            }
         }
 
         [Command("donkey")]
         [Summary("Shrek's companion to yell at.")]
         public async Task DonkeyYell()
-        {   
-            using(Context.Channel.EnterTypingState())
+        {
+            using (Context.Channel.EnterTypingState())
             {
                 ShrekMessage swamp = new ShrekMessage(true);
                 await ReplyAsync($"{swamp.GetValue("2")}");
@@ -43,7 +50,7 @@ namespace ShrekBot.Modules
                 Random rand = new Random();
                 int index = rand.Next(1, swamp.PairCount + 1);
                 await ReplyAsync(swamp.GetValue(index.ToString()));
-            }            
+            }
         }
 
         [Group("quote")]
@@ -64,12 +71,12 @@ namespace ShrekBot.Modules
                     await ReplyAsync("You can't give me nothing to add, Donkey!");
                     return;
                 }
-                    
+
                 ShrekMessage swamp = new ShrekMessage();
 
                 swamp.AddQuote(newQuote);
                 EmbedBuilder build = new EmbedBuilder();
-                
+
                 build.Description = $"{swamp.PairCount}: {newQuote}";
                 build.Color = Color.Green;
                 await ReplyAsync($"New quote added and saved!", false, build.Build());
@@ -94,7 +101,7 @@ namespace ShrekBot.Modules
 
                 await channel.SendMessageAsync($"Enter the quote to replace the value of Index {index}. Reply in {_interactivity.DefaultTimeout.Seconds} seconds");
                 var nextResult = await _interactivity.NextMessageAsync(x => x.Author.Id == Context.User.Id);
-                if(nextResult.IsSuccess)
+                if (nextResult.IsSuccess)
                 {
                     swamp.EditValue(index.ToString(), nextResult.Value.Content);
                     EmbedBuilder build = new EmbedBuilder();
@@ -106,23 +113,23 @@ namespace ShrekBot.Modules
                 {
                     await channel.SendMessageAsync("You ran out of time Donkey!");
                 }
-                
+
             }
         }
-  
+
         [Command("exit")]
         [RequireOwner]
         //[RequireContext(ContextType.Guild, ErrorMessage = "Shut down command cannot be used in Direct Message Channel.")]
         public async Task ExitAsync()
         {
             string s = "";
-            if(Context.Guild != null)
+            if (Context.Guild != null)
                 s = $"Initiating shut down command from the guild, {Context.Guild.Name}, in the text channel " +
                     $"{Context.Channel.Name}. {DateTime.Now}";
             else
                 s = $"Initiating shut down command from this DM. {DateTime.Now}.";
-            IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();            
-            await dmChannel.SendMessageAsync(s);            
+            IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();
+            await dmChannel.SendMessageAsync(s);
             Environment.Exit(0);
         }
     }

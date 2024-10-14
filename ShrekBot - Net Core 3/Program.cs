@@ -5,11 +5,10 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using ShrekBot.Modules;
 using ShrekBot.Modules.Configuration;
 using ShrekBot.Modules.Data_Files_and_Management;
-using ShrekBot.Modules.Swamp;
 using Interactivity;
+using ShrekBot.Modules.Swamp.Services;
 
 namespace ShrekBot
 {
@@ -51,8 +50,13 @@ namespace ShrekBot
                 }) 
             .BuildServiceProvider();
 
+            //ideally want to hide the fact this bot is online from Drake...
+            //but it's not working
+            //await _client.SetStatusAsync(UserStatus.Offline);
+
             _client.Log += _client_Log;
             _client.UserJoined += _client_UserJoined;
+            _client.MessageReceived += _client_MessageRecieved;
             //_client.Ready += _client_OnReady;
 
             await RegisterCommandsAsync();
@@ -89,10 +93,44 @@ namespace ShrekBot
                 {
                     ShrekMessage swamp = new ShrekMessage(true);
 
-                    await chnl.SendMessageAsync($"{user.Mention}!? {swamp.GetValue("1")}");
+                    await chnl.SendMessageAsync($"{user.Mention}!?!? " +
+                        $"{Environment.NewLine}{Environment.NewLine} {swamp.GetValue("1")}");
                 }
 
             }
+        }
+
+        private int Search(string pattern, string text)
+        {
+            return text.IndexOf(pattern, 0, StringComparison.CurrentCultureIgnoreCase);
+        }
+        private async Task _client_MessageRecieved(SocketMessage socketMessage)
+        {
+            if (socketMessage.Author.IsBot ||
+                socketMessage.Content[0] == Convert.ToChar(Config.bot.Prefix)) //ignore if command is used
+                return;
+
+            //may want to put in own method as an awaitable to not slow down the image listener part
+            //text listner
+            if(socketMessage.Channel.Id == 653106031731408896)//can send in one discord channel only
+            {
+                ShrekGIFs gifs = new ShrekGIFs();
+                for(int i = 0; i < gifs.SearchKeys.Length; i++)
+                {
+                    string key = gifs.SearchKeys[i];
+                    int value = Search(key, socketMessage.Content);
+                    if(value > -1)
+                        await socketMessage.Channel.SendMessageAsync(gifs.GetValue(key));
+                }
+            }
+            
+            
+            //next up, listen for an image to be deleted if needed...
+        }
+
+        private async Task<Task> TextListener()
+        {
+            return Task.CompletedTask;
         }
 
         private Task _client_Log(LogMessage arg)

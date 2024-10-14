@@ -1,3 +1,4 @@
+__________________________________________________________________--
 using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
@@ -614,4 +615,10 @@ namespace ShrekBot.Modules.Swamp
             return output.ToString();
         }
     }
+}
+
+_____________________________
+{
+  "allstar": "https://www.youtube.com/watch?v=Uo2SNtFofWI",
+  "hero": "https://www.youtube.com/watch?v=EasWdq7Njgo"
 }
