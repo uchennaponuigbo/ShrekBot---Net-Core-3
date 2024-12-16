@@ -9,6 +9,9 @@ using ShrekBot.Modules.Configuration;
 using ShrekBot.Modules.Data_Files_and_Management;
 using Interactivity;
 using ShrekBot.Modules.Swamp.Services;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace ShrekBot
 {
@@ -17,8 +20,11 @@ namespace ShrekBot
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
-       // /*public static*/ private LavaNode _lavaNode;
-        
+        private EventCooldownManager _eventCooldown;
+        private readonly ConcurrentDictionary<ulong, DateTimeOffset> _eventExecutionTimestamps
+            = new ConcurrentDictionary<ulong, DateTimeOffset>();
+        // /*public static*/ private LavaNode _lavaNode;
+
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
 
         public async Task RunBotAsync()
@@ -27,10 +33,11 @@ namespace ShrekBot
             { //perhaps it's an intents issue to why the bot can't join vc
                 LogLevel = LogSeverity.Verbose,
                 GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.DirectMessages | GatewayIntents.GuildMessageTyping |
-                GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates,
+                GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildMessages,
                 AlwaysDownloadUsers = true
             });
             _commands = new CommandService();
+            _eventCooldown = new EventCooldownManager();
             //_lavaNode = new LavaNode(_client, new LavaConfig());
 
             _services = new ServiceCollection()
@@ -49,7 +56,6 @@ namespace ShrekBot
                     DefaultTimeout = TimeSpan.FromSeconds(30) // You can optionally add a custom config
                 }) 
             .BuildServiceProvider();
-
             //ideally want to hide the fact this bot is online from Drake...
             //but it's not working
             //await _client.SetStatusAsync(UserStatus.Offline);
@@ -104,33 +110,61 @@ namespace ShrekBot
         {
             return text.IndexOf(pattern, 0, StringComparison.CurrentCultureIgnoreCase);
         }
-        private async Task _client_MessageRecieved(SocketMessage socketMessage)
+
+        private async Task TextRecieved(SocketMessage socketMessage)
         {
-            if (socketMessage.Author.IsBot ||
-                socketMessage.Content[0] == Convert.ToChar(Config.bot.Prefix)) //ignore if command is used
+            bool onCooldown = _eventCooldown.IsMessageOnCooldown(socketMessage.Author.Id);
+            if (onCooldown)
                 return;
 
-            //may want to put in own method as an awaitable to not slow down the image listener part
-            //text listner
-            if(socketMessage.Channel.Id == 653106031731408896)//can send in one discord channel only
+            ShrekGIFs gifs = new ShrekGIFs();
+            for (int i = 0; i < gifs.SearchKeys.Length; i++)
             {
-                ShrekGIFs gifs = new ShrekGIFs();
-                for(int i = 0; i < gifs.SearchKeys.Length; i++)
-                {
-                    string key = gifs.SearchKeys[i];
-                    int value = Search(key, socketMessage.Content);
-                    if(value > -1)
-                        await socketMessage.Channel.SendMessageAsync(gifs.GetValue(key));
-                }
+                string key = gifs.SearchKeys[i];
+                int value = Search(key, socketMessage.Content);
+                if (value > -1)
+                    await socketMessage.Channel.SendMessageAsync(gifs.GetValue(key));
             }
-            
-            
-            //next up, listen for an image to be deleted if needed...
         }
 
-        private async Task<Task> TextListener()
+        private async Task PictureRecieved(SocketMessage socketMessage)
         {
-            return Task.CompletedTask;
+            bool onCooldown = _eventCooldown.IsImageOnCooldown(socketMessage.Author.Id);
+            if (onCooldown)
+                return;
+            if (socketMessage.Attachments.Count > 0)
+            {
+                IEnumerable<Discord.Attachment> image = socketMessage.Attachments.Where(x =>
+                    x.Filename.EndsWith(".jpg") ||
+                    x.Filename.EndsWith(".png"));
+
+                //time to do the image detection algorithm thingy...
+
+                if(image.Any())
+                    await socketMessage.Channel.SendMessageAsync("Image checks out");
+            }
+        }
+        private async Task _client_MessageRecieved(SocketMessage socketMessage)
+        {
+            if (socketMessage.Author.IsBot)
+                return;
+       
+            if (socketMessage.Channel.Id == 653106031731408896)//can send in one discord channel only
+            {
+                //if the user is not using a command
+                if (socketMessage.Content[0] != Convert.ToChar(Config.bot.Prefix))
+                {                   
+                    await TextRecieved(socketMessage);
+                }
+                //if(!imageCheckedOrSent)        
+                //    await PictureRecieved(socketMessage);               
+            }
+
+            //if the user only sent an image
+            if (string.IsNullOrEmpty(socketMessage.Content))
+            {
+                await PictureRecieved(socketMessage);
+            }
         }
 
         private Task _client_Log(LogMessage arg)
