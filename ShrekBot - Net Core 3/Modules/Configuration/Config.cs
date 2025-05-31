@@ -3,17 +3,16 @@ using Newtonsoft.Json;
 
 namespace ShrekBot.Modules.Configuration
 {
-    public class Config
+    internal class Config
     {
-        private const string Path = "shrekbotconfig.json";
-        public static BotConfig bot;
+        internal static BotConfig bot;
         static Config()
         {
-            string json = File.ReadAllText(Path);
+            string json = File.ReadAllText("shrekbotconfig.json");
             bot = JsonConvert.DeserializeObject<BotConfig>(json);
         }
 
-        public struct BotConfig
+        internal struct BotConfig
         {
             public string Prefix;
             public string Token;

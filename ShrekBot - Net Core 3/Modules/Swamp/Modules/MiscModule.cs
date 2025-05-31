@@ -17,7 +17,7 @@ namespace ShrekBot.Modules.Swamp.Modules
         //}
 
         [Command("swamp")]
-        [Summary("Don't anger the orge.")]
+        [Remarks("Don't anger the orge.")]
         public async Task SwampYell()
         {
             //await Task.Delay(100);
@@ -29,7 +29,7 @@ namespace ShrekBot.Modules.Swamp.Modules
         }
 
         [Command("donkey")]
-        [Summary("Shrek's companion to yell at.")]
+        [Remarks("Shrek's companion to yell at.")]
         public async Task DonkeyYell()
         {
             using (Context.Channel.EnterTypingState())
@@ -38,10 +38,11 @@ namespace ShrekBot.Modules.Swamp.Modules
                 await ReplyAsync($"{swamp.GetValue("2")}");
             }
         }
-
+        //start adding remarks and summaries if needed for the help command
         [Command("random")]
         [Alias("r", "rand", "randmessage", "randommessage")]
-        [Summary("I could say WHATEVER I want without you telling me otherwise!")]
+        [Summary("Says a random Shrek quote.")]
+        [Remarks("I could say WHATEVER I want without you telling me otherwise!")]
         public async Task RandomessAsync()
         {
             using (Context.Channel.EnterTypingState())
@@ -62,11 +63,10 @@ namespace ShrekBot.Modules.Swamp.Modules
             public ManageFile(InteractivityService service) => _interactivity = service;
 
             [Command("add")]
-            [Alias("addrandom")]
-            [Remarks("There are no commands to remove messages. You can only modify content programatically.")]
-            public async Task TestCall(string newQuote = "")
+            [Summary("Adds a new quote from Shrek into the internal database.")]
+            public async Task TestCall(string newQuote)
             {
-                if (newQuote == "")
+                if (string.IsNullOrEmpty(newQuote))
                 {
                     await ReplyAsync("You can't give me nothing to add, Donkey!");
                     return;
@@ -77,12 +77,15 @@ namespace ShrekBot.Modules.Swamp.Modules
                 swamp.AddQuote(newQuote);
                 EmbedBuilder build = new EmbedBuilder();
 
+                build.Title = "New quote added and saved!";
                 build.Description = $"{swamp.PairCount}: {newQuote}";
                 build.Color = Color.Green;
-                await ReplyAsync($"New quote added and saved!", false, build.Build());
+                await ReplyAsync("", false, build.Build());
             }
 
             [Command("modify", RunMode = RunMode.Async)]
+            [Summary("Modifies an existing Shrek quote from the internal database.")]
+            [Remarks("There are no commands to remove messages. You can only modify content via this command.")]
             public async Task ModifyAsync(int index)
             {
                 var channel = Context.Client.GetChannel(Context.Channel.Id) as IMessageChannel;
@@ -113,11 +116,11 @@ namespace ShrekBot.Modules.Swamp.Modules
                 {
                     await channel.SendMessageAsync("You ran out of time Donkey!");
                 }
-
             }
         }
 
         [Command("exit")]
+        [Summary("Shuts down the Shrek Bot via command.")]
         [RequireOwner]
         //[RequireContext(ContextType.Guild, ErrorMessage = "Shut down command cannot be used in Direct Message Channel.")]
         public async Task ExitAsync()

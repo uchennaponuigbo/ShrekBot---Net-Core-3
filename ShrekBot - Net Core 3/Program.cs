@@ -11,7 +11,6 @@ using Interactivity;
 using ShrekBot.Modules.Swamp.Services;
 using System.Linq;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 namespace ShrekBot
 {
@@ -21,8 +20,6 @@ namespace ShrekBot
         private CommandService _commands;
         private IServiceProvider _services;
         private EventCooldownManager _eventCooldown;
-        private readonly ConcurrentDictionary<ulong, DateTimeOffset> _eventExecutionTimestamps
-            = new ConcurrentDictionary<ulong, DateTimeOffset>();
         // /*public static*/ private LavaNode _lavaNode;
 
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
@@ -39,7 +36,7 @@ namespace ShrekBot
             _commands = new CommandService();
             _eventCooldown = new EventCooldownManager();
             //_lavaNode = new LavaNode(_client, new LavaConfig());
-
+            //
             _services = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)

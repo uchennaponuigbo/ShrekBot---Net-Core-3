@@ -622,3 +622,312 @@ _____________________________
   "allstar": "https://www.youtube.com/watch?v=Uo2SNtFofWI",
   "hero": "https://www.youtube.com/watch?v=EasWdq7Njgo"
 }
+
+__________________________________________________________________________________
+//[Command("help2", RunMode = RunMode.Async)]
+        //[Summary("Lists this bot's general user commands.")]
+        //public async Task Help2(string path = "")
+        //{
+        //    EmbedBuilder output = new EmbedBuilder();
+        //    output.Title = "Shrek's Swamp";
+
+        //    List<ModuleInfo> modules = _commands.Modules.Where(m => m.Parent == null).ToList();
+
+        //    int ownerOnlyModsCount = 0;
+        //    int ownerOnlyCommandCount = 0;
+        //    List<CommandInfo> ownerOnlyCommands = new List<CommandInfo>();
+        //    List<CommandInfo> userCommands = new List<CommandInfo>();
+        //    foreach (ModuleInfo mod in modules)
+        //    {
+        //        if (CheckIfPreconHasOwner(mod.Preconditions))
+        //        {
+        //            ownerOnlyCommands.AddRange(mod.Commands);
+        //            ownerOnlyModsCount++;
+        //        }
+        //        else
+        //        {
+        //            AddCommands(mod, ref output, ref ownerOnlyCommandCount);
+        //        }
+
+
+
+        //        foreach(ModuleInfo subMod in mod.Submodules)
+        //        {
+        //            if (CheckIfPreconHasOwner(subMod.Preconditions))
+        //            {
+        //                ownerOnlyCommands.AddRange(subMod.Commands);
+        //                ownerOnlyModsCount++;
+        //            }
+        //            else
+        //            {
+        //                //check sub commands here
+        //                AddCommands(subMod, ref output, ref ownerOnlyCommandCount);
+        //            }
+
+
+        //        }
+        //    }
+
+        //    await ReplyAsync("", embed: output.Build());
+        //}
+
+        //[Command("help")]
+        //[Summary("Lists this bot's general user commands.")]
+        //public async Task Help(string path = "")
+        //{
+        //    //var modules = _commands.Modules.ToList();
+        //    //await ReplyAsync(modules.Count.ToString());
+        //    EmbedBuilder output = new EmbedBuilder();
+        //    if (path == "")
+        //    {
+        //        output.Title = "my bot - help";
+
+        //        foreach (var mod in _commands.Modules.Where(m => m.Parent == null))
+        //        {
+        //            AddHelp(mod, ref output);
+        //        }
+
+        //        output.Footer = new EmbedFooterBuilder
+        //        {
+        //            Text = "Use 'help <module>' to get help with a module."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        ModuleInfo mod = _commands.Modules
+        //            .FirstOrDefault(m => m.Name.Replace("Module", "").ToLower() == path.ToLower());
+
+
+        //        if (mod == null) 
+        //        { 
+        //            await ReplyAsync("No module could be found with that name."); 
+        //            return; 
+        //        }
+
+
+        //        output.Title = mod.Name;
+        //        output.Description = $"{mod.Summary}\n" +
+        //        (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
+        //        (mod.Aliases.Any() ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n" : "") +
+        //        (mod.Submodules.Any() ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n" : "") + " ";
+        //        AddCommands(mod, ref output);
+        //        output.Description = mod.Preconditions.Count.ToString();
+
+        //    }
+
+        //    await ReplyAsync("", embed: output.Build());
+        //}
+
+
+
+
+
+
+                //public void AddHelp(ModuleInfo module, ref EmbedBuilder builder)
+        //{
+        //    foreach (var sub in module.Submodules) 
+        //        AddHelp(sub, ref builder);
+        //    builder.AddField(f =>
+        //    {
+        //        f.Name = $"**{module.Name}**";
+        //        //f.Name = $"**{module.Preconditions.Where(n => n == "Discord.Commands.RequireOwnerAttribute" ).First()}**";
+        //        //f.Name = $"**{module.Attributes.Where(n => n.GetType().Name == "RequireOwnerAttribute")}**";
+        //        //f.Name = $"**{module.Attributes.Count}**";
+
+        //        //for precondition counting
+        //        //f.Name = $"**{module.Preconditions.Count}**";
+        //        f.Value = $"Submodules: {string.Join(", ", module.Submodules.Select(m => m.Name))}" +
+        //        $"\n" +
+        //        $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
+        //    });
+        //}
+
+
+        //[Command("help")]
+        //[Summary("Lists this bot's general user commands.")]
+        //public async Task Help()
+        //{
+        //    EmbedBuilder build = new EmbedBuilder();
+        //    build.Color = Color.Red;
+        //    build.Description = TextFile.UserCommands();
+        //    build.WithFooter("The bot will periodically send a random message every day at 6:00pm pst");
+        //    await ReplyAsync("", false, build.Build());
+
+        //}
+
+        //[Group("helpowner")]
+        //[RequireOwner]
+        //public class OwnerHelpModule : ModuleBase<SocketCommandContext>
+        //{
+        //    [Command("detail")]
+        //    [Summary("Lists the owner only commands in detail.")]
+        //    public async Task HelpOwner1()
+        //    {
+        //        EmbedBuilder build = new EmbedBuilder();
+        //        build.Color = Color.Red;
+        //        build.Description = TextFile.OwnerCommands();
+        //        build.WithFooter("The bot will periodically send a random message every day at 6:00pm pst");
+
+        //        IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();
+        //        await dmChannel.SendMessageAsync("", false, build.Build());
+        //    }
+
+        //    [Command("compact")]
+        //    [Summary("Lists all the commands without detail.")]
+        //    public async Task HelpOwner2()
+        //    {
+        //        EmbedBuilder build = new EmbedBuilder();
+        //        build.Color = Color.Red;
+        //        build.Description = TextFile.CompactCommands();
+        //        IDMChannel dmChannel = await Context.User.CreateDMChannelAsync();
+        //        await dmChannel.SendMessageAsync("", false, build.Build());
+
+        //    }
+        //}
+
+
+        ________________________________________________________________________________________________________
+        
+        //InteractivityResult<SocketMessage> nextResult = 
+            //    await _interactivity.NextMessageAsync(x => x.Author.Id == Context.User.Id);
+
+            //example
+            /*var paginator = BRSettings.DisplayKeys(DBTableNameAbberviations.KSA, Context);
+             * await _interactivity.SendPaginatorAsync(paginator, Context.Channel, TimeSpan.FromMinutes(1));*/
+
+
+            //Paginator paginator = CreatePaginatorEmbed(ownerOnlyCommands);
+            //await _interactivity.SendPaginatorAsync(paginator, Context.Channel, TimeSpan.FromMinutes(1));
+
+        private void EmbedCommands(IEnumerable<ModuleInfo> modules,
+           ref EmbedBuilder builder, bool checkOwner = true)
+        {
+            //may want to have just one list to iterate through...
+            
+            foreach(ModuleInfo module in modules)
+            {
+                StringBuilder usageText = new StringBuilder($"{Configuration.Config.bot.Prefix}");
+                if(CheckIfPreconHasOwner(module.Preconditions) == checkOwner) //whatever value I pass in, it has to match for it to be included in the help list
+                {
+
+                }
+
+
+            }
+        }
+
+        private Paginator CreatePaginatorEmbed(List<CommandInfo> commands)
+        {
+            int pageCount = 0;
+            int itemLimit = 0;
+            const int MaxItemsPerPage = 5;
+
+            if (commands.Count % MaxItemsPerPage - 1 == 0) //5 entries per page maximum
+                pageCount = commands.Count / MaxItemsPerPage - 1;
+            else
+            {
+                int entries = MaxItemsPerPage - 1;
+                pageCount = (((commands.Count + entries - 1) / entries) * entries) / entries; //reminder entries
+            }
+
+            PageBuilder[] pages = new PageBuilder[pageCount];
+            int pageEntryIndex = 0;
+
+            for (int i = 0; i < pages.Length; i++)
+            {
+                pages[i] = new PageBuilder().WithTitle($"{i}");
+                string data = "";
+                for (; pageEntryIndex < commands.Count; pageEntryIndex++)
+                {
+                    if (itemLimit < MaxItemsPerPage)
+                    {
+                        data += AddEmbedBuilderFields(commands[pageEntryIndex]);
+                        itemLimit++;
+                    }
+                    else
+                    {
+                        itemLimit = 0;
+                        break;
+                    }
+                }
+
+                pages[i].AddField(commands[i].Name, data, true);
+            }
+
+            return new StaticPaginatorBuilder()
+            .WithUsers(Context.User)
+            .WithPages(pages)
+            .WithFooter(PaginatorFooter.PageNumber | PaginatorFooter.Users)
+            .WithDefaultEmotes()
+            .Build();
+        }
+
+         public string AddEmbedBuilderFields(CommandInfo command)
+        {
+            return $"{command.Summary}\n " +
+                (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") +
+                (command.Aliases.Any() ? $"**Aliases:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n" : "") +
+                $"**Usage:** {GetAliases(command)}";
+        }
+
+______________________________________________________________________________________________________________________
+
+ //user should enter the pst time. the conversion from pst should be on the user, not the program
+        //public double MinutesUntilNextMessage(int roundDigits = 2)
+        //{
+        //    //utc is 7 hours ahead from pst
+        //    DateTime interval = DateTime.Parse(RepeatingIntervalTimePST,
+        //        new System.Globalization.CultureInfo("en-US"));
+
+        //    DateTime current = DateTime.Now.ToUniversalTime();
+
+        //    //if this bot is run after the interval (say, 6:00 pm) but before midnight,
+        //    //I'll get a negative number
+        //    //which tells me of how much time has past since 6:00pm
+
+        //    //To fix this, we check if the time is beyond the repeating interval (6:00pm), 
+        //    //if it is, then we move to the next day to get the amount of minutes
+        //    //until the interval in the next day
+        //    if (current > interval)
+        //        interval = interval.AddDays(1);
+        //    TimeSpan ts = interval - current;
+
+        //    return Math.Round(ts.TotalMinutes, roundDigits);
+        //}
+ 
+ 
+ public double MinutesUntilNextMessage(int digits = 2)
+        {
+            DateTime interval = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimePST,
+                new System.Globalization.CultureInfo("en-US")), DateTimeKind.Unspecified);  
+            DateTime current = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+            //Converting between 2 timezones
+            DateTime currentForeignTime = TimeZoneInfo.ConvertTime(current, timeZone);
+            DateTime intervalForeignTime = TimeZoneInfo.ConvertTime(interval, timeZone);
+
+            //if this bot is run after the interval (say, 6:00 pm) but before midnight,
+            //I'll get a negative number
+            //which tells me of how much time has past since 6:00pm
+
+            //To fix this, we check if the time is beyond the repeating interval (6:00pm), 
+            //if it is, then we move to the next day to get the amount of minutes
+            //until the interval in the next day
+            //    if (current > interval)
+            //        interval = interval.AddDays(1);
+
+            // 9/3/2024
+            //above if statement gives wrong times for frequency of message output
+            // e.g. 1 minute repeat at 4:06pm will say 1440 minutes at 4:05pm
+            //bottom method would fix this but won't allow users to enter a time in the past
+
+            //the interval adds by a minute
+            //intervalForeignTime = intervalForeignTime.AddMinutes(RepeatingMessageInMinutes);
+
+            if (currentForeignTime > intervalForeignTime)
+                intervalForeignTime = intervalForeignTime.AddMinutes(RepeatingMessageInMinutes); //intervalForeignTime.AddDays(1) .AddMinutes(RepeatingMessageInMinutes)
+            TimeSpan ts = intervalForeignTime - currentForeignTime;
+
+            double minutes = Math.Round(ts.TotalMinutes, digits);
+            return minutes;
+        }
+

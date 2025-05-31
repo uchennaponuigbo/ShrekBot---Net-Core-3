@@ -6,6 +6,7 @@ using ShrekBot.Modules.Swamp.Services;
 
 namespace ShrekBot.Modules.Swamp.Modules
 {
+    //[Custom_ModuleAlias("Music")]
     public class AudioModule : ModuleBase<SocketCommandContext>
     {
         //private readonly AudioService _audio;

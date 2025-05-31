@@ -13,6 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Modules\Data Files and Management\TextFile.cs" />
+    <Compile Remove="Modules\Swamp\Custom_ModuleAliasAttribute.cs" />
     <Compile Remove="Modules\Swamp\Services\AudioService_OLD.cs" />
   </ItemGroup>
 
@@ -21,18 +23,12 @@
     <Content Include="bin\Debug\music.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="bin\Debug\net6.0\help.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="bin\Debug\net6.0\helpowner.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="bin\Debug\net6.0\helpuser.txt" />
     <Content Include="bin\Debug\net6.0\shrekbotconfig.json" />
     <Content Include="bin\Debug\quotes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="bin\Debug\netcoreapp3.1\shrekbotconfig.json" />
+    <Content Include="bin\Debug\help.txt" />
     <Content Include="bin\Release\net6.0\bin\Debug\net6.0\shrekbotconfig.json" />
     <Content Include="bin\Release\net6.0\music.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
