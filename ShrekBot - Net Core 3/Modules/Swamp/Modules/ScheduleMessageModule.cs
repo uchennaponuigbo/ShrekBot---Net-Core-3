@@ -20,7 +20,7 @@ namespace ShrekBot.Modules.Swamp.Modules
         }
 
         [Command("stoptimer")]
-        [Alias("stop")]
+        [Alias("stop", "off", "timeroff")]
         public async Task StopCmd()
         {
             _service.Stop();
@@ -28,7 +28,7 @@ namespace ShrekBot.Modules.Swamp.Modules
         }
 
         [Command("starttimer")]
-        [Alias("start")]
+        [Alias("start", "on", "timeron")]
         [Summary("Or restart timer")]
         public async Task RestartCmd()
         {

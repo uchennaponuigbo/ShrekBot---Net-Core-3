@@ -19,7 +19,10 @@ namespace ShrekBot
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
+
         private EventCooldownManager _eventCooldown;
+        private ExtractWebLinkInfo _webLinkInfo;
+        
         // /*public static*/ private LavaNode _lavaNode;
 
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
@@ -34,7 +37,9 @@ namespace ShrekBot
                 AlwaysDownloadUsers = true
             });
             _commands = new CommandService();
+
             _eventCooldown = new EventCooldownManager();
+            _webLinkInfo = new ExtractWebLinkInfo();
             //_lavaNode = new LavaNode(_client, new LavaConfig());
             //
             _services = new ServiceCollection()
@@ -110,6 +115,14 @@ namespace ShrekBot
 
         private async Task TextRecieved(SocketMessage socketMessage)
         {
+            //check if user sent a link, do it before the cooldown command to circumvent it
+            UrlDetails link = _webLinkInfo.ExtractURL(socketMessage.Content);
+            if(!_webLinkInfo.IsUrlDetailsEmpty(link))
+            {
+                //TODO: SAVE TO DATABASE
+                await socketMessage.Channel.SendMessageAsync(link.ToString());
+            }
+
             bool onCooldown = _eventCooldown.IsMessageOnCooldown(socketMessage.Author.Id);
             if (onCooldown)
                 return;
