@@ -931,3 +931,62 @@ ________________________________________________________________________________
             return minutes;
         }
 
+        -______________________________________________________________________________________________-
+
+                //UTC is 8 hours ahead of PST during Daylight Savings Time or 7 without it
+        //public string MessageTimeInPST()
+        //{
+        //    TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+        //    DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
+        //        new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
+        //    bool daylightSaving = TimeZoneInfo.ConvertTime(nextMessageTime, timeZone).IsDaylightSavingTime();
+
+        //    if(!daylightSaving)
+        //        nextMessageTime = nextMessageTime.Subtract(new TimeSpan(8, 0, 0));
+        //    else
+        //        nextMessageTime = nextMessageTime.Subtract(new TimeSpan(7, 0, 0));
+        //    return nextMessageTime.ToString("h:mmtt");
+        //    //subtract 8 hours, return new time, profit
+        //}
+
+        //public double MinutesUntilNextMessage()
+        //{
+        //    //DateTime currentTime = DateTime.UtcNow;
+        //    //DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
+        //    //    new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
+
+        //    //if (nextMessageTime < currentTime)
+        //    //    nextMessageTime = nextMessageTime.AddDays(1);
+
+        //    //TimeSpan ts = nextMessageTime - currentTime;
+
+        //    //double minutes = Math.Round(ts.TotalMinutes, 2);
+        //    //if (minutes < 0.0)
+        //    //    minutes += RepeatingMessageInMinutes; //1440
+
+        //    //TODO: Generalize the minutes until next message fires
+
+        //    //return minutes;
+
+        //    //steps i should do
+        //    //if the repeating inteveral is greater than a day (24 hours, 1440 minutes, 86400 seconds)
+        //    //create a datetime instance that is at the next day at the time interval specified
+        //    //if it is not greater than this period,
+        //    //subtract final minus initial to get delta time
+
+        //}
+
+
+
+
+
+
+              //currentTime = currentTime.AddMinutes(RepeatingMessageInMinutes)/*.AddSeconds(-currentTime.Second)*/;
+            //RepeatingIntervalTimeUTC = currentTime.ToString("h:mmtt");
+            //MessageSentDateTime = currentTime;
+
+            //DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
+            //    new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
+
+            //if (nextMessageTime < currentTime)
+            //    nextMessageTime = nextMessageTime.AddDays(1);

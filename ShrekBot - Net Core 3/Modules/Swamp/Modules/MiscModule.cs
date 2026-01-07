@@ -9,12 +9,18 @@ namespace ShrekBot.Modules.Swamp.Modules
 {
     public class MiscModule : ModuleBase<SocketCommandContext>
     {
-        //[Command("test")]
-        //public async Task Test(string keyword)
-        //{
-        //    ShrekGIFs gifs = new ShrekGIFs();
-        //    await ReplyAsync(gifs.GetValue("shrek"));
-        //}
+        [Command("test")]
+        public async Task Test(/*string keyword*/)
+        {
+            //ShrekGIFs gifs = new ShrekGIFs();
+            //await ReplyAsync("<t:1759524196:t>"); //gifs.GetValue("shrek")
+            DateTime currentTime = DateTime.UtcNow;
+            long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
+            await ReplyAsync($"<t:{unixTime}:t>");
+        }
+
+        //<t:1759524231:f>  //current date and time
+        //"<t:1759524196:t>" //current time
 
         [Command("swamp")]
         [Remarks("Don't anger the orge.")]

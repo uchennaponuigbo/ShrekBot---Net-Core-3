@@ -15,18 +15,20 @@ namespace ShrekBot.Modules.Swamp.Services
     {
         private readonly Timer _timer;
         //private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+        private int _hour = 21; //11
+        private int _minute = 13; //0
         
         public ulong GuildChnlID { get; private set; }
 
         public double StartingMessageInMinutes { get; private set; }
         public double RepeatingMessageInMinutes { get; private set; }
         //public string RepeatingIntervalTimePST { get; private set; }
-        public string RepeatingIntervalTimeUTC { get; private set; }
+        //public string RepeatingIntervalTimeUTC { get; private set; }
         public DateTime MessageSentDateTime { get; private set; }
 
         public bool isPaused { get; private set; }
         public TimerService(DiscordSocketClient client)
-        {          
+        {
             SetTextChannel();
             isPaused = false;
             //StartingMessageInMinutes = 1; // 4) Time that message should fire after the timer is created
@@ -35,7 +37,7 @@ namespace ShrekBot.Modules.Swamp.Services
 
             //SetMessageTimes(1, DateTime.UtcNow.Add(new TimeSpan(0,1,0)).ToString("h:mm tt"));
             //SetMessageTimes(1440 * 2, DateTime.UtcNow.Add(new TimeSpan(0, 1, 0)).ToString("h:mm tt"));
-            //SetMessageTimes();
+            SetMessageTimes(1.0);
 
             Random rand = new Random();
             _timer = new Timer(async _ =>
@@ -49,11 +51,15 @@ namespace ShrekBot.Modules.Swamp.Services
                     await chnl.SendMessageAsync($"{randShrekMessage.GetValue(index.ToString())}");
                 }
 
-                AssignNewDate();
+                //MessageSentDateTime.AddMinutes(RepeatingMessageInMinutes); //adjustments...
+                //_hour = MessageSentDateTime.Hour;
+                //_minute = MessageSentDateTime.Minute;
+                AssignNewDateToUTC();
+                StartingMessageInMinutes = MinutesUntilNextMessage(); //added this here, will do more work tommorow
             },
             null,
-            TimeSpan.FromMinutes(StartingMessageInMinutes),
-            TimeSpan.FromMinutes(RepeatingMessageInMinutes));
+            TimeSpan.FromMinutes(StartingMessageInMinutes), //
+            TimeSpan.FromMinutes(RepeatingMessageInMinutes)); //
         }
 
         public void Stop()
@@ -64,7 +70,7 @@ namespace ShrekBot.Modules.Swamp.Services
 
         public void Restart()
         {
-            AssignNewDate();
+            AssignNewDateToUTC();
             StartingMessageInMinutes = MinutesUntilNextMessage();          
             _timer.Change(TimeSpan.FromMinutes(StartingMessageInMinutes), TimeSpan.FromMinutes(RepeatingMessageInMinutes));
             isPaused = false;
@@ -72,7 +78,7 @@ namespace ShrekBot.Modules.Swamp.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="newId"> Default value is the channel id for shrekbot testing</param>
+        /// <param name="newId"> Default value is the text channel id for shrekbot testing</param>
         public void SetTextChannel(ulong newId = 653106031731408896) => GuildChnlID = newId;
 
         //6:00PM pst is 10am utc or 11am on daylight savings time
@@ -82,76 +88,79 @@ namespace ShrekBot.Modules.Swamp.Services
         /// </summary>
         /// <param name="repeatIntervalInMinutes">This value represent the time until the first message fires</param>
         /// <param name="intervalTimeInUTC"></param>
-        public void SetMessageTimes(double repeatIntervalInMinutes = 1440, string intervalTimeInUTC = "6:00PM")
+        public void SetMessageTimes(double repeatIntervalInMinutes = 1440.0)
         {
-            RepeatingIntervalTimeUTC = intervalTimeInUTC;
+            //RepeatingIntervalTimeUTC = intervalTimeInUTC;,string intervalTimeInUTC = "6:00PM"
+            RepeatingMessageInMinutes = repeatIntervalInMinutes > 1440.0 ? 1440.0 : repeatIntervalInMinutes;
             RepeatingMessageInMinutes = repeatIntervalInMinutes < 1.0 ? 1.0 : repeatIntervalInMinutes;
-            AssignNewDate();
-            StartingMessageInMinutes = MinutesUntilNextMessage(); 
-            
-        }
-        //UTC is 8 hours ahead of PST during Daylight Savings Time or 7 without it
-        public string MessageTimeInPST()
-        {
-            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
-                new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
-            bool daylightSaving = TimeZoneInfo.ConvertTime(nextMessageTime, timeZone).IsDaylightSavingTime();
+            AssignNewDateToUTC();
 
-            if(!daylightSaving)
-                nextMessageTime = nextMessageTime.Subtract(new TimeSpan(8, 0, 0));
-            else
-                nextMessageTime = nextMessageTime.Subtract(new TimeSpan(7, 0, 0));
-            return nextMessageTime.ToString("h:mmtt");
-            //subtract 8 hours, return new time, profit
+            StartingMessageInMinutes = MinutesUntilNextMessage(); 
+
+            //DateTime currentTime = DateTime.UtcNow;
+
+            //long unixTime = ((DateTimeOffset)currentTime).ToUnixTimeSeconds(); 
+            //int secondsInCurrentMinute = (int)(unixTime % 60);
+            //int secondsUntilNextMinute = 60 - secondsInCurrentMinute;
+            //if (secondsUntilNextMinute < 6) //if at or under 5 seconds
+            //    secondsUntilNextMinute += 60; //move to the next minute
+            //StartingMessageInMinutes = Math.Round(secondsUntilNextMinute / 60.0, 1);
+
         }
 
         public double MinutesUntilNextMessage()
         {
             DateTime currentTime = DateTime.UtcNow;
-            DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
-                new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
 
-            if (nextMessageTime < currentTime)
-                nextMessageTime = nextMessageTime.AddDays(1);
-
-            TimeSpan ts = nextMessageTime - currentTime;
-
+            TimeSpan ts = MessageSentDateTime - currentTime;
+            //the math that calculates the next time the message fires is done elsewhere
             double minutes = Math.Round(ts.TotalMinutes, 2);
-            if (minutes < 0.0)
-                minutes += RepeatingMessageInMinutes; //1440
 
             return minutes;
         }
 
-        //public double MinutesUntilNextMessage()
-        //{
-        //    DateTime currentTime = DateTime.UtcNow;
-
-        //    TimeSpan ts = MessageSentDateTime - currentTime;
-
-        //    double minutes = Math.Round(ts.TotalMinutes, 2);
-
-        //    return minutes;
-        //}
-
-        private void AssignNewDate()
+        /// <summary>
+        /// Timezone independent
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        private void AssignNewDateToUTC()
         {
-            DateTime currentTime = DateTime.UtcNow;
-            currentTime = currentTime.AddMinutes(RepeatingMessageInMinutes)/*.AddSeconds(-currentTime.Second)*/;
-            RepeatingIntervalTimeUTC = currentTime.ToString("h:mmtt");
-            MessageSentDateTime = currentTime;
+            if (_hour > 24) _hour = 23; //11pm before the new day
+            if (_hour < 0) _hour = 0; //12am on the new day
 
-            //DateTime nextMessageTime = DateTime.SpecifyKind(DateTime.Parse(RepeatingIntervalTimeUTC,
-            //    new System.Globalization.CultureInfo("en-US")), DateTimeKind.Utc);
+            if (_minute > 59) _minute = 59;
+            if (_minute < 0) _minute = 0;
 
-            //if (nextMessageTime < currentTime)
-            //    nextMessageTime = nextMessageTime.AddDays(1);
+            DateTime current = DateTime.UtcNow;
+            
+      
+
+            int year = current.Year;
+            int month = current.Month;
+            int day = current.Day;
+
+            //why is this line of code going forward in time?
+            MessageSentDateTime = new DateTime(year, month, day, _hour, _minute, 0).ToUniversalTime();
+            //long nextUnixTime = ((DateTimeOffset)MessageSentDateTime).ToUnixTimeSeconds();
+            //long curUnixTime = ((DateTimeOffset)current).ToUnixTimeSeconds();
+            //long final = nextUnixTime - curUnixTime;
+            //Console.WriteLine(final);
+            TimeSpan ts = MessageSentDateTime - current; 
+            if (ts.TotalMinutes < 0)
+            {
+                MessageSentDateTime = MessageSentDateTime.AddDays(1);
+            }
+                
+            //RepeatingIntervalTimeUTC = MessageSentDateTime.ToString("h:mmtt");
         }
 
-        public string PrintTime()
+        public string PrintTime(bool shortTimeFormat = true)
         {
-            return "";
+            long unix = ((DateTimeOffset)MessageSentDateTime).ToUnixTimeSeconds();
+            if(shortTimeFormat)
+                return $"<t:{unix}:t>"; //time (11:13pm)
+            return $"<t:{unix}:f>"; // Month, day, year at time (October 12th, 2025 at 11:13pm)
         }
         /*
          * Should correlate to my time zone regardless of where this bot is hosted.

@@ -114,11 +114,16 @@ namespace ShrekBot
         }
 
         private async Task TextRecieved(SocketMessage socketMessage)
-        {
+        {            
             //check if user sent a link, do it before the cooldown command to circumvent it
             UrlDetails link = _webLinkInfo.ExtractURL(socketMessage.Content);
             if(!_webLinkInfo.IsUrlDetailsEmpty(link))
             {
+                //TODO: may need to move this elsewhere.
+                SocketGuildChannel messageChannel = (SocketGuildChannel)socketMessage.Channel;
+                UrlDetails discordMessageUrl = _webLinkInfo.ExtractDiscordUrl(messageChannel.Guild.Id, 
+                    socketMessage.Channel.Id, socketMessage.Id);
+
                 //TODO: SAVE TO DATABASE
                 await socketMessage.Channel.SendMessageAsync(link.ToString());
             }

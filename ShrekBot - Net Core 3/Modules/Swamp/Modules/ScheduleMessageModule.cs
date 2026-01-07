@@ -33,21 +33,21 @@ namespace ShrekBot.Modules.Swamp.Modules
         public async Task RestartCmd()
         {
             _service.Restart();
-            double nextMinutes = _service.MinutesUntilNextMessage();
-            double repeatMinutes = _service.RepeatingMessageInMinutes;
-            string hourConversion = "";
-            string repeatingHourConversion = "";
+            //double nextMinutes = _service.MinutesUntilNextMessage();
+            //double repeatMinutes = _service.RepeatingMessageInMinutes;
+            //string hourConversion = "";
+            //string repeatingHourConversion = "";
 
-            FormatSingularOrPluralMessage(nextMinutes, repeatMinutes, 
-                ref hourConversion, ref repeatingHourConversion);
+            //FormatSingularOrPluralMessage(nextMinutes, repeatMinutes, 
+            //    ref hourConversion, ref repeatingHourConversion);
 
-            string message = "Donkey! I will shout something at" +
-                $" {_service.RepeatingIntervalTimeUTC} UTC ({_service.MessageTimeInPST()} PST). " +
-                $"Aka in {nextMinutes} minute{(nextMinutes == 60 ? "" : "s")}{hourConversion}. " +
-                $"Expect another message {repeatMinutes} minute{(repeatMinutes == 60 ? "" : "s")}{repeatingHourConversion}" +
-                $" after that. And after that too!";
+            //string message = "Donkey! I will shout something at" +
+            //    $" {_service.RepeatingIntervalTimeUTC} UTC ({_service.MessageTimeInPST()} PST). " +
+            //    $"Aka in {nextMinutes} minute{(nextMinutes == 60 ? "" : "s")}{hourConversion}. " +
+            //    $"Expect another message {repeatMinutes} minute{(repeatMinutes == 60 ? "" : "s")}{repeatingHourConversion}" +
+            //    $" after that. And after that too!";
 
-            await ReplyAsync(message);
+            //await ReplyAsync(message);
         }
 
         [Command("setchannel")]
@@ -68,26 +68,26 @@ namespace ShrekBot.Modules.Swamp.Modules
 
         [Command("assignnewtime")]
         [Alias("newtime", "ant")]
-        public async Task SetTimeInterval(double newRepeatingInterval, string newIntervalTimeInUTC)
+        public async Task SetTimeInterval(double newRepeatingInterval, /*string newIntervalTimeInUTC*/ int hour, int minute)
         {
-            if(newRepeatingInterval < 0)
-            {
-                await ReplyAsync("Donkey! How does a negative repeat time makes sense!!");
-                return;
-            }
+            //if(newRepeatingInterval < 0)
+            //{
+            //    await ReplyAsync("Donkey! How does a negative repeat time makes sense!!");
+            //    return;
+            //}
                 
-            if (!IsValidTimeFormat(newIntervalTimeInUTC))
-            {
-                await ReplyAsync("Donkey! What clock on what planet have you been reading!? " +
-                    "You better not of forgotten the AM/PM too...");
-                return;
-            }
-            //TODO
-            //if this format is correct, but it's in the past...
+            //if (!IsValidTimeFormat(newIntervalTimeInUTC))
+            //{
+            //    await ReplyAsync("Donkey! What clock on what planet have you been reading!? " +
+            //        "You better not of forgotten the AM/PM too...");
+            //    return;
+            //}
+            ////TODO
+            ////if this format is correct, but it's in the past...
 
 
-            _service.SetMessageTimes(newRepeatingInterval, newIntervalTimeInUTC);
-            _service.Restart();
+            //_service.SetMessageTimes(newRepeatingInterval, newIntervalTimeInUTC);
+            //_service.Restart();
             await ReplyAsync("Fine, Donkey! I will shout my messages at a different time!");
         }
 
@@ -116,26 +116,33 @@ namespace ShrekBot.Modules.Swamp.Modules
                 await ReplyAsync("Yo Donkey! You told me to shut up!");
                 return;
             }
-
+            //ReplyAsync(_service.PrintTime())
             double nextMinutes = _service.MinutesUntilNextMessage();
             double repeatMinutes = _service.RepeatingMessageInMinutes;
             string hourConversion = "";
             string repeatingHourConversion = "";
 
-            FormatSingularOrPluralMessage(nextMinutes, repeatMinutes, 
+            FormatSingularOrPluralMessage(nextMinutes, repeatMinutes,
                 ref hourConversion, ref repeatingHourConversion);
 
-            string message = $"I shout the next message every " +
-                $"{repeatMinutes} minute{(repeatMinutes == 1 ? "" : "s")}{repeatingHourConversion}. " +
-                $"My next message will be in {nextMinutes} minute{(nextMinutes == 60 ? "" : "s")}{hourConversion}, " +
-                $"at {_service.RepeatingIntervalTimeUTC} UTC. ({_service.MessageTimeInPST()} PST)" +
-                $" at {_service.MessageSentDateTime}"; // ({_service.MessageTimeinPST()} PST
+            //string message = $"I shout the next message every " +
+            //    $"{repeatMinutes} minute{(repeatMinutes == 1 ? "" : "s")}{repeatingHourConversion}. " +
+            //    $"My next message will be in {nextMinutes} minute{(nextMinutes == 60 ? "" : "s")}{hourConversion}, " +
+            //    $"at {_service.RepeatingIntervalTimeUTC} UTC. ({_service.MessageTimeInPST()} PST)" +
+            //    $" at {_service.MessageSentDateTime}"; // ({_service.MessageTimeinPST()} PST
 
-            await ReplyAsync(message);
+            //string message = $"I shout the next message every " +
+            //    $"{repeatMinutes} minute{(repeatMinutes == 1 ? "" : "s")}{repeatingHourConversion}. " +
+            //    $"My next message will be in {nextMinutes} minute{(nextMinutes == 60 ? "" : "s")}{hourConversion}, " +
+            //    $"at {_service.RepeatingIntervalTimeUTC} UTC." +
+            //    $" at {_service.MessageSentDateTime}"; // ({_service.MessageTimeinPST()} PST
+
+            //await ReplyAsync(message);
+            await ReplyAsync($"Donkey, I shout the next time at {_service.PrintTime()}, in {nextMinutes} minutes. After that, expect a message, {repeatMinutes} minutes after that too!");
         }
 
         //Convoluted code just to make sure the singular or plural is correct
-        private void FormatSingularOrPluralMessage(double nextMinutes, double repeatMinutes, 
+        private void FormatSingularOrPluralMessage(double nextMinutes, double repeatMinutes,
             ref string hourConversion, ref string repeatingHourConversion)
         {
             if (nextMinutes > 59)

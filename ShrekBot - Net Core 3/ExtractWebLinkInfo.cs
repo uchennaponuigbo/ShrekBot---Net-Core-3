@@ -6,14 +6,16 @@ using System.Web;
 
 namespace ShrekBot
 { 
+    // 1/6/2026 Waiting to be updated from Test Project code
     internal struct UrlDetails
     {
         /// <summary>
-        /// Unique set of characters and/or numbers that define the website url
+        /// Unique set of characters and/or numbers that define the website url. 
+        /// <para>In Discord's case, this will represented as "ServerId/ChannelId/MessageId"</para>
         /// </summary>
         public string UrlId;
         /// <summary>
-        /// username or name of subreddit, or nothing if its YouTube
+        /// Twitter username or name of subreddit, or nothing if its YouTube or Discord
         /// </summary>
         public string Name;
 
@@ -54,8 +56,8 @@ namespace ShrekBot
                 return details; //return empty strings, avoid the checks
 
             //optional group at the very end breaks my current logic for non-youtube links, so I have to account for that
-            string[] ifThereIsAddedGarbageInUrl = discordMessage.Split("?");
-            string nonYoutubeLink = ifThereIsAddedGarbageInUrl[0];
+            string[] removeTheAddedGarbageInUrl = discordMessage.Split("?");
+            string nonYoutubeLink = removeTheAddedGarbageInUrl[0];
 
             //We want to avoid running this whole function every time someone sends a message, due to the Regex checks
             details = CheckIfTwitterURL(nonYoutubeLink);
@@ -73,6 +75,22 @@ namespace ShrekBot
                 details.UrlId = youtubeVideoId;
             }
             return details;
+        }
+
+        /// <summary>
+        /// Structured as "serverid/channelid/messageid"
+        /// </summary>
+        /// <param name="guildId"></param>
+        /// <param name="channelId"></param>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        public UrlDetails ExtractDiscordUrl(ulong guildId, ulong channelId, ulong messageId)
+        {
+            //serverid/channelid/messageid
+            string messageLink = $"{guildId}/{channelId}/{messageId}";
+            return new UrlDetails(messageLink, "");
+            //example
+            //https://discord.com/channels/370001518927020032/370001518927020037/370080067428024320
         }
 
         public bool IsUrlDetailsEmpty(UrlDetails details) 
@@ -203,6 +221,13 @@ namespace ShrekBot
         {
             if (!redditUrl.isIdEmpty() && redditUrl.Name != "")
                 return $"https://www.reddit.com/r/{redditUrl.Name}/comments/{redditUrl.UrlId}/";
+            return "";
+        }
+
+        public string CreateDiscordTextChannelURL(UrlDetails discordTextChannelUrl)
+        {
+            if (!discordTextChannelUrl.isIdEmpty() && discordTextChannelUrl.Name != "")
+                return $"https://discord.com/channels/{discordTextChannelUrl.UrlId}";
             return "";
         }
     }
