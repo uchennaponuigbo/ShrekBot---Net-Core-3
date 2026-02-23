@@ -990,3 +990,31 @@ ________________________________________________________________________________
 
             //if (nextMessageTime < currentTime)
             //    nextMessageTime = nextMessageTime.AddDays(1);
+
+
+            ____________________________________________________
+
+            dapper
+
+            //internal ParamDB SelectFrom_Youtube(ulong discordUserId, string regexed_videoId)
+        //{
+        //    using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        //    {
+        //        //string sql = "SELECT video_id, discord_message_link_id, timestamp_created FROM Youtube_Links\r\n" +
+        //        //    "WHERE discord_user_id = 243379806463459328 AND video_id = '-wtIMTCHWuI'\r\n" +
+        //        //    "ORDER BY timestamp_created";
+        //        string sql = SelectFromTable(regexed_videoId, discordUserId, "Youtube_Links", "video_id");
+        //        ParamDB db = new ParamDB();
+
+        //        var parameters = new
+        //        {
+        //            video_id = db.urlDetails.UrlId,  // video_id = db.video_id //video_id = db.urlDetails.UrlId
+        //            discord_message_link_id = db.urlDetails.DiscordMessageLinkIds, //discord_message_link_id = db.urlDetails.DiscordMessageLinkIds, //db.discord_message_link_id
+        //            /*db.timestamp_created*/
+        //        };
+
+        //        return connection.Query<ParamDB>(sql, parameters)
+        //        .ToList()[0];
+
+        //    }
+        //}

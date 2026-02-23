@@ -4,6 +4,7 @@ using Discord;
 using Discord.Commands;
 using ShrekBot.Modules.Data_Files_and_Management;
 using Interactivity;
+using System.IO;
 
 namespace ShrekBot.Modules.Swamp.Modules
 {

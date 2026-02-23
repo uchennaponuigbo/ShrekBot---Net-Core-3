@@ -1,52 +1,82 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace ShrekBot
-{ 
-    // 1/6/2026 Waiting to be updated from Test Project code
+{
+    //1/17/2026 FUNCTIONALITY IS DONE. COPY TO SHREKBOT
+    //1/22/2026 ADDING OBJECT TO REFERENCE DISCORD MESSAGELINK
+    //2/19/2026 EVEN MORE GARBAGE ADDED
     internal struct UrlDetails
     {
         /// <summary>
         /// Unique set of characters and/or numbers that define the website url. 
-        /// <para>In Discord's case, this will represented as "ServerId/ChannelId/MessageId"</para>
         /// </summary>
         public string UrlId;
         /// <summary>
-        /// Twitter username or name of subreddit, or nothing if its YouTube or Discord
+        /// Twitter username or name of subreddit, or nothing if its YouTube
         /// </summary>
         public string Name;
 
-        public UrlDetails(string uid, string name)
+        /// <summary>
+        /// Represented as "ServerId/ChannelId/MessageId"
+        /// </summary>
+        public string DiscordMessageLinkIds;
+
+        public UrlDetails(string uid, string name, string dmli)
         {
             UrlId = uid;
             this.Name = name;
+            DiscordMessageLinkIds = dmli;
+            timestamp_created = "";
         }
 
+        //public UrlDetails()
+        //{
+
+        //}
+
         public bool isIdEmpty() => string.IsNullOrEmpty(UrlId);
+        public bool isNameEmpty() => string.IsNullOrEmpty(Name);
+
+        public bool isIdAndNameEmpty() => isIdEmpty() && isNameEmpty();
 
         public override string ToString()
         {
-            return $"{Name} | {UrlId}";
+            return $"{Name} | {UrlId} | {DiscordMessageLinkIds} | {timestamp_created}";
         }
+        /// <summary>
+        /// Retrieved from Database
+        /// </summary>
+        internal string timestamp_created { get; }
+    }
+
+    internal enum WebDomain
+    {
+        None = 0,
+        YouTube = 1,
+        Twitter = 2,
+        Reddit = 3
+        //bluesky?
     }
 
     internal class ExtractWebLinkInfo
     {
-        internal enum WebDomain
-        {
-            None = 0,
-            YouTube = 1,
-            Twitter = 2,
-            Reddit = 3
-        }
-
         internal WebDomain Domain { get; private set; }
-        internal ExtractWebLinkInfo() { Domain = WebDomain.None;  }
-
-        public UrlDetails ExtractURL(string discordMessage)
+        internal ExtractWebLinkInfo() { Domain = WebDomain.None; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="discordMessage"></param>
+        /// <param name="discordMessageIds">guildid/serverid | channelid | messageid</param>
+        /// <returns></returns>
+        internal UrlDetails ExtractURL(string discordMessage, Tuple<ulong, ulong, ulong> discordMessageIds)
         {
             Domain = WebDomain.None;
             UrlDetails details = new UrlDetails();
@@ -59,12 +89,13 @@ namespace ShrekBot
             string[] removeTheAddedGarbageInUrl = discordMessage.Split("?");
             string nonYoutubeLink = removeTheAddedGarbageInUrl[0];
 
-            //We want to avoid running this whole function every time someone sends a message, due to the Regex checks
-            details = CheckIfTwitterURL(nonYoutubeLink);
+            //We want to try and avoid running this whole function every time someone sends a message, due to the Regex checks
+
+            details = CheckIfTwitterURL(nonYoutubeLink, discordMessageIds);
             if (Domain == WebDomain.Twitter)
                 return details;
 
-            details = CheckIfRedditURL(nonYoutubeLink);
+            details = CheckIfRedditURL(nonYoutubeLink, discordMessageIds);
             if (Domain == WebDomain.Reddit)
                 return details;
 
@@ -73,8 +104,23 @@ namespace ShrekBot
                 details.Name = ""; //we don't need the twitter username to be a part of the youtube check
                 string youtubeVideoId = GetYouTubeVideoIdFromUrl(discordMessage, uri);
                 details.UrlId = youtubeVideoId;
+                ExtractDiscordUrl(ref details, discordMessageIds.Item1, discordMessageIds.Item2, discordMessageIds.Item3);
             }
             return details;
+        }
+        /// <summary>
+        /// Structured as "serverid/channelid/messageid"
+        /// </summary>
+        /// <param name="guildId"></param>
+        /// <param name="channelId"></param>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        public string ExtractDiscordUrl(ulong guildId, ulong channelId, ulong messageId)
+        {
+            //serverid/channelid/messageid
+            return $"{guildId}/{channelId}/{messageId}";
+            //example
+            //https://discord.com/channels/370001518927020032/370001518927020037/370080067428024320
         }
 
         /// <summary>
@@ -83,18 +129,53 @@ namespace ShrekBot
         /// <param name="guildId"></param>
         /// <param name="channelId"></param>
         /// <param name="messageId"></param>
-        /// <returns></returns>
-        public UrlDetails ExtractDiscordUrl(ulong guildId, ulong channelId, ulong messageId)
+        public void ExtractDiscordUrl(ref UrlDetails url, ulong guildId, ulong channelId, ulong messageId)
         {
             //serverid/channelid/messageid
             string messageLink = $"{guildId}/{channelId}/{messageId}";
-            return new UrlDetails(messageLink, "");
-            //example
-            //https://discord.com/channels/370001518927020032/370001518927020037/370080067428024320
+            url.DiscordMessageLinkIds = messageLink;
         }
 
-        public bool IsUrlDetailsEmpty(UrlDetails details) 
+        public bool IsUrlDetailsEmpty(UrlDetails details)
             => details.isIdEmpty() && string.IsNullOrEmpty(details.Name);
+
+        private UrlDetails GetIdAndNameFromUrl(string guaranteedUrl, int idOffset, int nameOffset,
+            WebDomain thisDomain, Tuple<ulong, ulong, ulong> discordMessageIds)
+        {
+            Domain = thisDomain;
+            string[] splits = guaranteedUrl.Split("/");
+            string urlId = splits[splits.Length - idOffset];
+            string username = splits[splits.Length - nameOffset];
+            string messageLinks = ExtractDiscordUrl(discordMessageIds.Item1, discordMessageIds.Item2, discordMessageIds.Item3);
+
+            return new UrlDetails(urlId, username, messageLinks);
+        }
+
+        private UrlDetails CheckIfTwitterURL(string possibleTwitterUrl, Tuple<ulong, ulong, ulong> discordMessageIds)
+        {
+            Regex regex =
+                new Regex("^(htt(p|ps):\\/\\/|www\\.|htt(p|ps):\\/\\/www\\.)(((f|v)x)?twitter|fixvx|(fixup)?x)\\.com\\/\\w{1,15}\\/status\\/\\d{1,19}$"); //(\\?s=\\d{1,2}\\&t=\\w{1,22})?
+            //extra regex fluff commented out
+            if (regex.IsMatch(possibleTwitterUrl))
+            {
+                //string[] ifThereIsAddedGarbageInUrl = possibleTwitterUrl.Split("?");
+                return GetIdAndNameFromUrl(possibleTwitterUrl, 1, 3, WebDomain.Twitter, discordMessageIds); //ifThereIsAddedGarbageInUrl[0]
+            }
+            return new UrlDetails(); //invalid URL
+        }
+
+        private UrlDetails CheckIfRedditURL(string possibleRedditUrl, Tuple<ulong, ulong, ulong> discordMessageIds)
+        {
+            Regex regex =
+                new Regex("^(htt(p|ps):\\/\\/(old\\.|new\\.)?|htt(p|ps):\\/\\/www\\.)reddit\\.com\\/r\\/\\w{1,21}\\/comments\\/\\w{1,8}\\/\\w{1,300}\\/$");
+
+            if (regex.IsMatch(possibleRedditUrl))
+            {
+                return GetIdAndNameFromUrl(possibleRedditUrl, 3, 5, WebDomain.Reddit, discordMessageIds);
+            }
+            return new UrlDetails();
+
+        }
 
         private Uri CheckUrl(string possibleURL)
         {
@@ -105,49 +186,13 @@ namespace ShrekBot
                 {
                     uri = new UriBuilder("http", possibleURL).Uri;
                 }
-                catch(UriFormatException)
+                catch (UriFormatException)
                 {
                     // invalid url
                     return null;
                 }
             }
             return uri;
-        }
-
-        private UrlDetails GetIdAndNameFromUrl(string guaranteedUrl, int idOffset, int nameOffset, WebDomain thisDomain)
-        {
-            Domain = thisDomain;
-            string[] splits = guaranteedUrl.Split("/");
-            string urlId = splits[splits.Length - idOffset];
-            string username = splits[splits.Length - nameOffset];
-
-            return new UrlDetails(urlId, username);
-        }
-
-        private UrlDetails CheckIfTwitterURL(string possibleTwitterUrl)
-        {
-            Regex regex = 
-                new Regex("^(htt(p|ps):\\/\\/|www\\.|htt(p|ps):\\/\\/www\\.)((fx)?twitter|(fixup)?x)\\.com\\/\\w{1,15}\\/status\\/\\d{1,19}$"); //(\\?s=\\d{1,2}\\&t=\\w{1,22})?
-            //extra regex fluff commented out
-            if (regex.IsMatch(possibleTwitterUrl))
-            {
-                //string[] ifThereIsAddedGarbageInUrl = possibleTwitterUrl.Split("?");
-                return GetIdAndNameFromUrl(possibleTwitterUrl, 1, 3, WebDomain.Twitter); //ifThereIsAddedGarbageInUrl[0]
-            }
-            return new UrlDetails(); //invalid URL
-        }       
-
-        public UrlDetails CheckIfRedditURL(string possibleRedditUrl)
-        {
-            Regex regex = 
-                new Regex("^(htt(p|ps):\\/\\/(old\\.|new\\.)?|htt(p|ps):\\/\\/www\\.)reddit\\.com\\/r\\/\\w{1,21}\\/comments\\/\\w{1,8}\\/\\w{1,300}\\/$");
-
-            if (regex.IsMatch(possibleRedditUrl))
-            {
-                return GetIdAndNameFromUrl(possibleRedditUrl, 3, 5, WebDomain.Reddit);
-            }
-            return new UrlDetails();
-
         }
 
         private string GetYouTubeVideoIdFromUrl(string youtubeUrl, Uri uri)
@@ -185,13 +230,13 @@ namespace ShrekBot
             {
                 // remove a trailing forward space
                 string last = uri.Segments.Last().Replace("/", "");
-                
+
                 if (regex.IsMatch(last))//@"^v=[a-zA-Z0-9_-]{11}$" //Regex.IsMatch(last, YouTube_Video_Id_Regex
                 {
                     Domain = WebDomain.YouTube;
                     return last.Replace("v=", "");
                 }
-                    
+
 
                 string[] segments = uri.Segments;
                 if (segments.Length > 2 && segments[segments.Length - 2] != "v/" && segments[segments.Length - 2] != "watch/")
@@ -212,23 +257,27 @@ namespace ShrekBot
 
         public string CreateTwitterURL(UrlDetails twitterUrl)
         {
-            if (!twitterUrl.isIdEmpty())
+            if (!twitterUrl.isIdAndNameEmpty())
                 return $"https://twitter.com/{twitterUrl.Name}/status/{twitterUrl.UrlId}";
             return "";
         }
 
         public string CreateRedditURL(UrlDetails redditUrl)
         {
-            if (!redditUrl.isIdEmpty() && redditUrl.Name != "")
+            if (!redditUrl.isIdAndNameEmpty())
                 return $"https://www.reddit.com/r/{redditUrl.Name}/comments/{redditUrl.UrlId}/";
             return "";
         }
 
         public string CreateDiscordTextChannelURL(UrlDetails discordTextChannelUrl)
         {
-            if (!discordTextChannelUrl.isIdEmpty() && discordTextChannelUrl.Name != "")
-                return $"https://discord.com/channels/{discordTextChannelUrl.UrlId}";
+            if (!discordTextChannelUrl.isIdEmpty())
+                return $"https://discord.com/channels/{discordTextChannelUrl.DiscordMessageLinkIds}";
             return "";
         }
+
+        public string CreateDiscordTextChannelURL(MediaDetails discordTextChannelUrl)
+            => $"https://discord.com/channels/{discordTextChannelUrl.DiscordMessageLinkIds}";
+
     }
 }
