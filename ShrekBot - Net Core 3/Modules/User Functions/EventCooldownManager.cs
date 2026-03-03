@@ -34,6 +34,12 @@ namespace ShrekBot
                                                 < TimeSpan.FromSeconds(cooldownTime);
         }
 
+        /// <summary>
+        /// Checks if the user is on a cooldown
+        /// </summary>
+        /// <remarks>This adds a new user if it doesn't exist in the list</remarks>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public bool IsMessageOnCooldown(ulong userId)
         {
             if(CheckCooldown(userId, MessageCoolDown))
@@ -52,7 +58,12 @@ namespace ShrekBot
             _executionTimestamps[userId] = modified;
             return false;
         }
-
+        /// <summary>
+        /// Checks if the user is on a cooldown
+        /// </summary>
+        /// <remarks>This adds a new user if it doesn't exist in the list</remarks>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public bool IsImageOnCooldown(ulong userId)
         {
             if (CheckCooldown(userId, ImageCoolDown))

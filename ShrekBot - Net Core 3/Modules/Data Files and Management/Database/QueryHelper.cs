@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
-namespace ShrekBot.Modules.Database
+namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal partial class SwampDB
     {
@@ -106,6 +107,18 @@ ORDER BY ROWID DESC LIMIT 5
             return sb.ToString();
         }
 
+        private string InsertIntoValues_Bulk(Dictionary<MediaDetails, byte> mediaDetails, ulong discordUserId, string table_Name)
+        {
+            StringBuilder sb = new StringBuilder($"INSERT INTO {table_Name} (hash, discord_user_id, discord_message_link_id) ");
+            foreach(KeyValuePair<MediaDetails, byte> media in mediaDetails)
+            {
+                sb.Append($"VALUES ({media.Key.Hash}, {discordUserId}, '{media.Key.DiscordMessageLinkIds}'),");
+            }
+            sb.Length--;
+
+            return sb.ToString();
+        }
+
         private string DeleteOneRecordFromTable(UrlDetails url, ulong discordUserId,
             string table_Name, string urlId_Column)
         {
@@ -120,6 +133,13 @@ ORDER BY ROWID DESC LIMIT 5
                 $"WHERE discord_user_id = {discordUserId} AND hash = {media.Hash} ORDER BY ROWID ASC LIMIT 1)";
         }
 
+        private string DeleteNRecordsFromTable_Bulk(ulong hash, ulong discordUserId,
+            string table_Name, int recordsToDelete)
+        {
+            return $"DELETE FROM {table_Name} WHERE ROWID IN (SELECT ROWID FROM {table_Name} " +
+                $"WHERE discord_user_id = {discordUserId} AND hash = {hash} ORDER BY ROWID ASC LIMIT {recordsToDelete})";
+        }
+
         private string CountRecordsOfUser(string table_name, ulong discordUserId, string urlId_Column, UrlDetails url)
         {
             return $"SELECT COUNT(*) AS count FROM {table_name} " +
@@ -132,6 +152,12 @@ ORDER BY ROWID DESC LIMIT 5
                 $"WHERE discord_user_id = {discordUserId} AND hash = {media.Hash}";
         }
 
+        private string CountRecordsByUserAndHash(string table_name, ulong discordUserId, ulong hash)
+        {
+            return $"SELECT Count(*) FROM {table_name} " +
+                $"WHERE discord_user_id = {discordUserId} AND hash = {hash}";
+        }
+
         private string DeleteNRecordsFromTable(int recordsToDelete, string table_Name)
         {
             return $"DELETE FROM {table_Name} WHERE ROWID IN " +
@@ -140,7 +166,7 @@ ORDER BY ROWID DESC LIMIT 5
 
         private string AllTableRecordsCount()
         {
-            //the SQL CAST is to fix a bug in Dapper where values are proprely casted 
+            //the SQL CAST is to fix a bug in Dapper where primative values are not properly casted 
             return "SELECT 'Discord_Users' AS Tables, CAST(COUNT(*) AS INTEGER) AS Records FROM Discord_Users " +
                 "UNION ALL " +
                 "SELECT 'Youtube_Links', CAST(COUNT(*) AS INTEGER) FROM Youtube_Links " +

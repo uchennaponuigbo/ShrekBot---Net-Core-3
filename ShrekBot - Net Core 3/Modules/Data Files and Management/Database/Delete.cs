@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShrekBot.Modules.Database
+namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal partial class SwampDB
     {
@@ -65,7 +65,7 @@ namespace ShrekBot.Modules.Database
         /// </summary>
         /// <param name="diffHashVariant"></param>
         /// <returns>Number of rows deleted</returns>
-        internal int DeleteAbominationVariantFrom_Images(ulong diffHashVariant)
+        internal static int DeleteAbominationVariantFrom_Images(ulong diffHashVariant)
         {
             using (IDbConnection connection = new SQLiteConnection(_connectionString))
             {

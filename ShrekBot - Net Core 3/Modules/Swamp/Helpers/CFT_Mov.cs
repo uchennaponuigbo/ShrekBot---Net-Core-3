@@ -1,7 +1,7 @@
 ﻿using FileTypeChecker;
 using FileTypeChecker.Abstracts;
 
-namespace ShrekBot
+namespace ShrekBot.Modules.Swamp.Helpers
 {
     //Custom File Type = CFT
     internal class CFT_Mov : FileType

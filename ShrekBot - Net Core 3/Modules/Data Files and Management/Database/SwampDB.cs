@@ -5,14 +5,25 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 
-namespace ShrekBot.Modules.Database
+namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal partial class SwampDB
     {
-        private string _connectionString;
+        private static readonly string _connectionString;
         private const int _MaxDuplicates = 5;
-        public const int _DBTimeoutSec = 6;
+        private const int _DBTimeoutSec = 6;
         internal SwampDB()
+        {
+            //const string dbName = "ShrekbotDB.db";
+            //_connectionString = $"Data Source={dbName};Version=3;";
+            //if (!File.Exists(dbName))
+            //{
+            //    SQLiteConnection.CreateFile(dbName); //uncomment when I need to create a new database                
+            //    CreateAndSetUp();
+            //}  
+        }
+
+        static SwampDB()
         {
             const string dbName = "ShrekbotDB.db";
             _connectionString = $"Data Source={dbName};Version=3;";
@@ -20,10 +31,10 @@ namespace ShrekBot.Modules.Database
             {
                 SQLiteConnection.CreateFile(dbName); //uncomment when I need to create a new database                
                 CreateAndSetUp();
-            }  
+            }
         }
 
-        private void CreateAndSetUp()
+        private static void CreateAndSetUp()
         {
             string[] sqlFiles = Directory.GetFiles(@".\sql files", "*.sql");
             SQLiteConnection connection = new SQLiteConnection(_connectionString);
@@ -60,7 +71,7 @@ namespace ShrekBot.Modules.Database
         /// <param name="discordUserId"></param>
         /// <param name="discordName"></param>
         /// <returns></returns>
-        internal int AddNewFriend(ulong discordUserId, string discordName)
+        internal static int AddNewFriend(ulong discordUserId, string discordName)
         {
             using (IDbConnection connection = new SQLiteConnection(_connectionString))
             {
@@ -78,7 +89,7 @@ namespace ShrekBot.Modules.Database
         /// </remarks>
         /// <param name="discordUserId"></param>
         /// <returns></returns>
-        internal int RemoveFriend(ulong discordUserId)
+        internal static int RemoveFriend(ulong discordUserId)
         {
             using (IDbConnection connection = new SQLiteConnection(_connectionString))
             {

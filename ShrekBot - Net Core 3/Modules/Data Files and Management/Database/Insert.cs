@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 
-namespace ShrekBot.Modules.Database
+namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal partial class SwampDB
     {

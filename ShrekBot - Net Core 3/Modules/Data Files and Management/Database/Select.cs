@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShrekBot.Modules.Database
+namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal partial class SwampDB
     {

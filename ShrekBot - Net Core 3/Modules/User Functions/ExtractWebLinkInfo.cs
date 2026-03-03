@@ -7,65 +7,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using ShrekBot.Modules.Data_Files_and_Management.Database;
 
 namespace ShrekBot
 {
     //1/17/2026 FUNCTIONALITY IS DONE. COPY TO SHREKBOT
     //1/22/2026 ADDING OBJECT TO REFERENCE DISCORD MESSAGELINK
     //2/19/2026 EVEN MORE GARBAGE ADDED
-    internal struct UrlDetails
-    {
-        /// <summary>
-        /// Unique set of characters and/or numbers that define the website url. 
-        /// </summary>
-        public string UrlId;
-        /// <summary>
-        /// Twitter username or name of subreddit, or nothing if its YouTube
-        /// </summary>
-        public string Name;
-
-        /// <summary>
-        /// Represented as "ServerId/ChannelId/MessageId"
-        /// </summary>
-        public string DiscordMessageLinkIds;
-
-        public UrlDetails(string uid, string name, string dmli)
-        {
-            UrlId = uid;
-            this.Name = name;
-            DiscordMessageLinkIds = dmli;
-            timestamp_created = "";
-        }
-
-        //public UrlDetails()
-        //{
-
-        //}
-
-        public bool isIdEmpty() => string.IsNullOrEmpty(UrlId);
-        public bool isNameEmpty() => string.IsNullOrEmpty(Name);
-
-        public bool isIdAndNameEmpty() => isIdEmpty() && isNameEmpty();
-
-        public override string ToString()
-        {
-            return $"{Name} | {UrlId} | {DiscordMessageLinkIds} | {timestamp_created}";
-        }
-        /// <summary>
-        /// Retrieved from Database
-        /// </summary>
-        internal string timestamp_created { get; }
-    }
-
-    internal enum WebDomain
-    {
-        None = 0,
-        YouTube = 1,
-        Twitter = 2,
-        Reddit = 3
-        //bluesky?
-    }
-
+    
     internal class ExtractWebLinkInfo
     {
         internal WebDomain Domain { get; private set; }
@@ -247,37 +196,5 @@ namespace ShrekBot
                 return last.Split('&')[0];
             }
         }
-
-        public string CreateYouTubeURL(UrlDetails youtubeUrl)
-        {
-            if (!youtubeUrl.isIdEmpty())
-                return "https://www.youtube.com/watch?v=" + youtubeUrl.UrlId;
-            return "";
-        }
-
-        public string CreateTwitterURL(UrlDetails twitterUrl)
-        {
-            if (!twitterUrl.isIdAndNameEmpty())
-                return $"https://twitter.com/{twitterUrl.Name}/status/{twitterUrl.UrlId}";
-            return "";
-        }
-
-        public string CreateRedditURL(UrlDetails redditUrl)
-        {
-            if (!redditUrl.isIdAndNameEmpty())
-                return $"https://www.reddit.com/r/{redditUrl.Name}/comments/{redditUrl.UrlId}/";
-            return "";
-        }
-
-        public string CreateDiscordTextChannelURL(UrlDetails discordTextChannelUrl)
-        {
-            if (!discordTextChannelUrl.isIdEmpty())
-                return $"https://discord.com/channels/{discordTextChannelUrl.DiscordMessageLinkIds}";
-            return "";
-        }
-
-        public string CreateDiscordTextChannelURL(MediaDetails discordTextChannelUrl)
-            => $"https://discord.com/channels/{discordTextChannelUrl.DiscordMessageLinkIds}";
-
     }
 }
