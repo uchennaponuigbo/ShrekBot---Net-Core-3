@@ -73,5 +73,63 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
                 return connection.Execute(sql, null, null, _DBTimeoutSec);
             }
         }
+
+        /// <summary>
+        /// Use for manually removing a specfic regex id from a database table
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <param name="urlId"></param>
+        /// <returns></returns>
+        internal int DeleteUrlIdFrom_Table(WebDomain domain, string urlId)
+        {
+            switch (domain)
+            {
+                case WebDomain.YouTube:
+                    return DeleteUrlIdFrom("Youtube_links", "video_id", urlId);
+                case WebDomain.Twitter:
+                    return DeleteUrlIdFrom("Twitter_Links", "tweet_id", urlId);
+                case WebDomain.Reddit:
+                    return DeleteUrlIdFrom("Reddit_Links", "reddit_id", urlId);
+                default:
+                    return -1;
+            }
+        }
+
+        private int DeleteUrlIdFrom(string table_name, string id_column_name, string urlId)
+        {
+            using (IDbConnection connection = new SQLiteConnection(_connectionString))
+            {
+                string sql = $"DELETE FROM {table_name} WHERE {id_column_name} = '{urlId}'";
+                return connection.Execute(sql, null, null, _DBTimeoutSec);
+            }
+        }
+
+        /// <summary>
+        /// Use for manually deleted a specific hash from a database table
+        /// </summary>
+        /// <param name="tableMedia"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        internal int DeleteHashFrom_Table(Media tableMedia, ulong hash)
+        {
+            switch (tableMedia)
+            {
+                case Media.Image:
+                    return DeleteHashFrom("Images", hash);
+                case Media.Video:
+                    return DeleteHashFrom("Videos", hash);
+                default:
+                    return -1;
+            }
+        }
+
+        private int DeleteHashFrom(string table_name, ulong hash)
+        {
+            using (IDbConnection connection = new SQLiteConnection(_connectionString))
+            {
+                string sql = $"DELETE FROM {table_name} WHERE hash = {hash}";
+                return connection.Execute(sql, null, null, _DBTimeoutSec);
+            }
+        }
     }
 }
