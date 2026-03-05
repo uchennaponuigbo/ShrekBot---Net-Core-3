@@ -52,7 +52,6 @@ namespace ShrekBot
             //_webLinkInfo = new ExtractWebLinkInfo();
             _textChannelWhiteList = new WhiteListedChannels();
             //_imagesAndVideoComparison = new ImageComparison();
-            //_database = new SwampDB();
             //_lavaNode = new LavaNode(_client, new LavaConfig());
             SwampDB initializeDB = new SwampDB(); //for calling the static method that initializes the database
             _services = new ServiceCollection()

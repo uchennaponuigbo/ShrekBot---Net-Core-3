@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace ShrekBot.Modules.Data_Files_and_Management.Database
 {
     internal enum WebDomain
@@ -63,7 +65,13 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
 
     internal struct MediaDetails
     {
+        /// <summary>
+        /// Value hashed via the Difference Image Hash
+        /// </summary>
         internal ulong Hash { get; }
+        /// <summary>
+        /// Represented as "ServerId/ChannelId/MessageId"
+        /// </summary>
         internal string DiscordMessageLinkIds { get; }
 
         public MediaDetails(ulong h, string dmli)
@@ -79,7 +87,24 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
 
         public override string ToString()
         {
-            return $"Hash Value: {Hash} | {DiscordMessageLinkIds} | {timestamp_created}";
+            return $"{Hash} | {DiscordMessageLinkIds} | {timestamp_created}";
         }
+
+        public override bool Equals([NotNullWhen(true)] object obj)
+        {
+            if (obj is not MediaDetails detail)
+            {
+                return false;
+            }
+            return detail.Hash == this.Hash;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Hash.GetHashCode();
+        }
+
+        public static bool operator ==(MediaDetails a, MediaDetails b) => a.Equals(b);
+        public static bool operator !=(MediaDetails a, MediaDetails b) => !a.Equals(b);
     }    
 }

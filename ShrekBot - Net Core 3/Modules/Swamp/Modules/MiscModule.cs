@@ -1,10 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
-using ShrekBot.Modules.Data_Files_and_Management;
 using Interactivity;
+using ShrekBot.Modules.Data_Files_and_Management;
+using System;
 using System.IO;
+using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace ShrekBot.Modules.Swamp.Modules
 {
@@ -15,9 +16,46 @@ namespace ShrekBot.Modules.Swamp.Modules
         {
             //ShrekGIFs gifs = new ShrekGIFs();
             //await ReplyAsync("<t:1759524196:t>"); //gifs.GetValue("shrek")
-            DateTime currentTime = DateTime.UtcNow;
-            long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
-            await ReplyAsync($"<t:{unixTime}:t>");
+            //DateTime currentTime = DateTime.UtcNow;
+            //long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
+            //await ReplyAsync($"<t:{unixTime}:t>");
+
+            //string message = "Put this in a file and send to discord AND ADD MORE CHARACTERS OR SOMETHING IDK";
+            //StreamWriter sw = null;
+            //try
+            //{
+            //    using (MemoryStream ms = new MemoryStream())
+            //    {
+            //        sw = new StreamWriter(ms/*, leaveOpen: true*/);
+            //        sw.Write(message);
+            //        sw.Flush();
+            //        ms.Position = 0;
+
+            //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
+
+            //    }
+            //}
+            //finally
+            //{
+            //    if (sw != null)
+            //        sw.Dispose();
+            //}
+
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    using(StreamWriter sw = new StreamWriter(ms))
+            //    {
+            //        sw.Write(message);
+            //        //sw.Flush();
+            //        ms.Position = 0;
+
+            //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
+            //    }
+
+            //    //Cannot access a Closed Stream
+
+            //}
+
         }
 
         //<t:1759524231:f>  //current date and time
@@ -70,7 +108,7 @@ namespace ShrekBot.Modules.Swamp.Modules
             public ManageFile(InteractivityService service) => _interactivity = service;
 
             [Command("add")]
-            [Summary("Adds a new quote from Shrek into the internal database.")]
+            [Summary("Adds a new quote from Shrek into the internal file.")]
             public async Task TestCall(string newQuote)
             {
                 if (string.IsNullOrEmpty(newQuote))
@@ -91,7 +129,7 @@ namespace ShrekBot.Modules.Swamp.Modules
             }
 
             [Command("modify", RunMode = RunMode.Async)]
-            [Summary("Modifies an existing Shrek quote from the internal database.")]
+            [Summary("Modifies an existing Shrek quote from the internal file.")]
             [Remarks("There are no commands to remove messages. You can only modify content via this command.")]
             public async Task ModifyAsync(int index)
             {
@@ -142,5 +180,9 @@ namespace ShrekBot.Modules.Swamp.Modules
             await dmChannel.SendMessageAsync(s);
             Environment.Exit(0);
         }
+
+
+        //commands to add and remove channels to white list
+        //if parameters are empty, then the current channel this command is involked will be added to whitelist
     }
 }

@@ -130,7 +130,7 @@ namespace ShrekBot
         /// <summary>
         /// Removes an abomination variant from the blacklist, not database
         /// </summary>
-        /// <remarks>Why would I ever call this function?</remarks>
+        /// <remarks>Why would I ever call this function directly or indirectly?</remarks>
         /// <param name="abominationHash"></param>
         /// <param name="swamp"></param>
         /// <returns><c>true</c> if successfully removed. <c>false</c> if unable to.</returns>
@@ -142,7 +142,7 @@ namespace ShrekBot
         /// </summary>
         /// <returns></returns>
         internal string GetAbominationKeysAndNames()
-            => PrintDictionaries(ref _abominations, "The Abomination and its Variants");
+            => PrintDictionaries(ref _abominations, "**__The Abomination and its Variants__**");
         
         /// <summary>
         /// Adds an exempt hash and removes all records of it from the database
@@ -185,12 +185,12 @@ namespace ShrekBot
         /// </summary>
         /// <returns></returns>
         internal string GetExemptKeysAndNames() 
-            => PrintDictionaries(ref _exempt, "Exempt Images");
+            => PrintDictionaries(ref _exempt, "**__Exempt Images__**");
 
         /// <summary>
         /// Adds a hash value to the list that is neither an abomination variant or an exempt hash
         /// </summary>
-        /// <remarks>Values in the list are meant to be added to database after I verify that this is a false positive</remarks>
+        /// <remarks>Values in the list are meant to be added to database after I visually verify that this is a false positive</remarks>
         /// <param name="falsePositiveHash"></param>
         /// <param name="name"></param>
         internal void AddFalsePositive(ulong falsePositiveHash, string name)
@@ -219,7 +219,7 @@ namespace ShrekBot
         
 
         internal string GetFalsePositiveKeysAndNames() 
-            => PrintDictionaries(ref _falsePositives, "False Positives");
+            => PrintDictionaries(ref _falsePositives, "**__False Positives__**");
         
         /// <summary>
         /// Excludes GIFs
@@ -264,8 +264,9 @@ namespace ShrekBot
         private string PrintDictionaries(ref ConcurrentDictionary<ulong, string> dictionary, string title)
         {
             StringBuilder sb = new StringBuilder(title + "\n");
+            sb.AppendLine("**Hash** | _Name_");
             foreach (var item in dictionary)
-                sb.AppendLine($"Hash: {item.Key} | Name: {item.Value}");
+                sb.AppendLine($"**{item.Key}** | _{item.Value}_");
             return sb.ToString();
         }
     }
