@@ -13,8 +13,8 @@ namespace ShrekBot.Modules.Data_Files_and_Management
         protected Dictionary<string, string> pairs;
         public bool DoesFileExist { get; protected set; }
         public int PairCount { get { return pairs.Count; } }
-        
-        public JSONManagement() => pairs = new Dictionary<string, string>();
+
+        public JSONManagement() { pairs = new Dictionary<string, string>(); DoesFileExist = true; }
         
         protected void ValidateFileContents()
         {
@@ -23,14 +23,16 @@ namespace ShrekBot.Modules.Data_Files_and_Management
                 File.WriteAllText(filePath, "");
                 SaveDataToFile();
                 DoesFileExist = false;
-            }
-            DoesFileExist = true;
+            }            
         }
 
         protected void SaveDataToFile()
         {
-            string json = JsonConvert.SerializeObject(pairs, Formatting.Indented);
-            File.WriteAllText(filePath, json);
+            if(DoesFileExist)
+            {
+                string json = JsonConvert.SerializeObject(pairs, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+            }        
         }
 
         protected void Initialize(string relativePath, string name)
@@ -57,16 +59,19 @@ namespace ShrekBot.Modules.Data_Files_and_Management
         }
 
         protected IList<string> GetKeys()
-        {
-            IList<string> keys;
-            using (StreamReader sr = File.OpenText(filePath))
-            using (JsonTextReader reader = new JsonTextReader(sr))
+        {           
+            if(DoesFileExist)
             {
-                JObject json = (JObject)JToken.ReadFrom(reader);
-                keys = json.Properties().Select(p => p.Name).ToList();
+                IList<string> keys;
+                using (StreamReader sr = File.OpenText(filePath))
+                using (JsonTextReader reader = new JsonTextReader(sr))
+                {
+                    JObject json = (JObject)JToken.ReadFrom(reader);
+                    keys = json.Properties().Select(p => p.Name).ToList();
+                }
+                return keys;
             }
-
-            return keys;
+            return System.Array.Empty<string>();
         }
         //check if file exists on public methods, to remove the validation in the command classes in case of error
         public bool DoesKeyExist(string key) 
@@ -83,6 +88,21 @@ namespace ShrekBot.Modules.Data_Files_and_Management
         {
             pairs[key] = newValue;
             SaveDataToFile();
+        }
+
+        public void AddValue(string name, string value)
+        {
+            pairs.Add(name, value);
+            SaveDataToFile();
+        }
+
+        public void RemoveValue(string name)
+        {
+            if(pairs.ContainsKey(name))
+            {
+                pairs.Remove(name);
+                SaveDataToFile();
+            }     
         }
     }
 }

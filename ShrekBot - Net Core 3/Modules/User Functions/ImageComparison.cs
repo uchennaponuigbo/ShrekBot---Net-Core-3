@@ -98,7 +98,8 @@ namespace ShrekBot
             return hashedPercentage >= _HammingDistanceTolerance;
         }
 
-        internal ulong VideoHash()
+        //TODO: Complete this
+        internal ulong VideoHash(Stream streamFromAttachmentURL)
         {
             return 0;
         }
@@ -179,7 +180,6 @@ namespace ShrekBot
         internal bool RemoveExemptHash(ulong exemptHash)
             => _exempt.TryRemove(exemptHash, out string _);
         
-
         /// <summary>
         /// Gets a string of hashes and filenames of the hashes from the exempt dictionary
         /// </summary>
@@ -217,7 +217,6 @@ namespace ShrekBot
         internal bool RemoveFalsePositiveHash(ulong falsePositiveHash)
             => _falsePositives.TryRemove(falsePositiveHash, out string _);
         
-
         internal string GetFalsePositiveKeysAndNames() 
             => PrintDictionaries(ref _falsePositives, "**__False Positives__**");
         

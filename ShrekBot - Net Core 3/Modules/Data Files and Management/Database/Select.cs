@@ -30,7 +30,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
                 case WebDomain.Reddit:
                     urlDetails = SelectFrom_Reddit(discordUserId, regexed_videoId); break;
                 default:
-                    urlDetails = new UrlDetails[0]; break;
+                    urlDetails = Array.Empty<UrlDetails>(); break;
             }
             return urlDetails;
         }
@@ -105,7 +105,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
                 case Media.Video:
                     mediaDetails = SelectFrom_Videos(discordUserId, hash); break;
                 default:
-                    mediaDetails = new MediaDetails[0]; break;
+                    mediaDetails = Array.Empty<MediaDetails>(); break;
             }
             return mediaDetails;
         }
@@ -160,7 +160,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
                 case Media.Video:
                     return SelectMessageLinksFrom_Table(hash, "", "Videos", "hash");
                 default:
-                    return new string[0];
+                    return Array.Empty<string>();
             }
             //string sql = SelectFromTable()
             //should I join this statement in the other functions and add another parameter? or should I keep it seperate here?

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ShrekBot.Modules.Data_Files_and_Management.Database
@@ -40,7 +41,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
             UrlId = uid;
             this.Name = name;
             DiscordMessageLinkIds = dmli;
-            timestamp_created = "";
+            timestamp_created = DateTimeOffset.UtcNow.ToString(); 
         }
 
         //public UrlDetails()
@@ -78,7 +79,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
         {
             Hash = h;
             DiscordMessageLinkIds = dmli;
-            timestamp_created = "";
+            timestamp_created = DateTimeOffset.UtcNow.ToString();
         }
         /// <summary>
         /// Retrieved from Database

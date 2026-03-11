@@ -12,6 +12,7 @@ namespace ShrekBot.Modules.Swamp.Modules
     public class MiscModule : ModuleBase<SocketCommandContext>
     {
         [Command("test")]
+        [RequireOwner]
         public async Task Test(/*string keyword*/)
         {
             //ShrekGIFs gifs = new ShrekGIFs();
@@ -20,41 +21,8 @@ namespace ShrekBot.Modules.Swamp.Modules
             //long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
             //await ReplyAsync($"<t:{unixTime}:t>");
 
-            //string message = "Put this in a file and send to discord AND ADD MORE CHARACTERS OR SOMETHING IDK";
-            //StreamWriter sw = null;
-            //try
-            //{
-            //    using (MemoryStream ms = new MemoryStream())
-            //    {
-            //        sw = new StreamWriter(ms/*, leaveOpen: true*/);
-            //        sw.Write(message);
-            //        sw.Flush();
-            //        ms.Position = 0;
-
-            //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
-
-            //    }
-            //}
-            //finally
-            //{
-            //    if (sw != null)
-            //        sw.Dispose();
-            //}
-
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    using(StreamWriter sw = new StreamWriter(ms))
-            //    {
-            //        sw.Write(message);
-            //        //sw.Flush();
-            //        ms.Position = 0;
-
-            //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
-            //    }
-
-            //    //Cannot access a Closed Stream
-
-            //}
+            await ReplyAsync("https://tenor.com/view/abell46s-reface-shrek-ilucion-optica-screaming-gif-19071434 " +
+                "https://tenor.com/view/shrek-mud-shower-shrek-mud-shower-shrek-shower-gif-22792672");
 
         }
 

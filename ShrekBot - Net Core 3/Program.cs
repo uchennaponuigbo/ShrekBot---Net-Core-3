@@ -10,7 +10,9 @@ using ShrekBot.Modules.Data_Files_and_Management.Database;
 using ShrekBot.Modules.Swamp.Helpers;
 using ShrekBot.Modules.Swamp.Services;
 using ShrekBot.Modules.User_Functions;
+using SixLabors.ImageSharp;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +32,7 @@ namespace ShrekBot
 
         private EventCooldownManager _eventCooldown;
         //private ExtractWebLinkInfo _webLinkInfo;
-        private WhiteListedChannels _textChannelWhiteList;
+        //private TextChannelWhiteList _textChannelWhiteList;
         //internal ImageComparison _imagesAndVideoComparison;
     
         // /*public static*/ private LavaNode _lavaNode;
@@ -50,10 +52,10 @@ namespace ShrekBot
 
             _eventCooldown = new EventCooldownManager();
             //_webLinkInfo = new ExtractWebLinkInfo();
-            _textChannelWhiteList = new WhiteListedChannels();
+            //_textChannelWhiteList = new TextChannelWhiteList();
             //_imagesAndVideoComparison = new ImageComparison();
             //_lavaNode = new LavaNode(_client, new LavaConfig());
-            SwampDB initializeDB = new SwampDB(); //for calling the static method that initializes the database
+            
             _services = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
@@ -73,13 +75,14 @@ namespace ShrekBot
             //ideally want to hide the fact this bot is online from Drake...
             //but it's not working
             //await _client.SetStatusAsync(UserStatus.Offline);
-
+            
             _client.Log += _client_Log;
             _client.UserJoined += _client_UserJoined;
             _client.UserLeft += _client_UserLeft;
             _client.UserBanned += _client_UserBanned;
+            _client.ChannelDestroyed += _client_TextChannelDeleted;
             _client.MessageReceived += _client_MessageRecieved;
-            //_client.Ready += _client_OnReady;
+            _client.Ready += _client_OnReady;
 
             await RegisterCommandsAsync();
             await _client.LoginAsync(TokenType.Bot, Config.bot.Token);
@@ -87,24 +90,22 @@ namespace ShrekBot
             await Task.Delay(-1);
         }
 
-
-
-
-
-        //private async Task _client_OnReady()
-        //{
-        //    if (!_lavaNode.IsConnected)
-        //    {
-        //        try
-        //        {
-        //            await _lavaNode.ConnectAsync();
-        //        }
-        //        catch(Exception ex)
-        //        {
-        //            Console.WriteLine(ex.Message);
-        //        }
-        //    }
-        //}
+        private async Task _client_OnReady()
+        {
+            //if (!_lavaNode.IsConnected)
+            //{
+            //    try
+            //    {
+            //        await _lavaNode.ConnectAsync();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine(ex.Message);
+            //    }
+            //}
+            _ = new SwampDB(); //for calling the static method that initializes the database
+            await Task.CompletedTask;
+        }
 
         private async Task _client_UserJoined(SocketGuildUser user)
         {     
@@ -114,7 +115,7 @@ namespace ShrekBot
             if (user.Guild == _client.GetGuild(DrakeServer)) //if the person joined Drake's discord...
             {
                 const ulong WelcomeChannel = 553092290990571535;
-                IMessageChannel chnl = _client.GetChannel(WelcomeChannel) as IMessageChannel;
+                ITextChannel chnl = _client.GetChannel(WelcomeChannel) as ITextChannel;
                 if (chnl != null)
                 {
                     ShrekMessage swamp = new ShrekMessage(true);
@@ -123,7 +124,6 @@ namespace ShrekBot
                         $"{Environment.NewLine}{Environment.NewLine} {swamp.GetValue("1")}");
                     SwampDB.AddNewFriend(user.Id, user.Username);
                 }
-
             }
         }
         private async Task _client_UserLeft(SocketGuild guild, SocketUser user)
@@ -141,6 +141,13 @@ namespace ShrekBot
                 return;
 
             SwampDB.RemoveFriend(user.Id);
+            await Task.CompletedTask;
+        }
+
+        private async Task _client_TextChannelDeleted(SocketChannel channel)
+        {
+            if(TextChannelWhiteList.ContainsId(channel.Id))
+                TextChannelWhiteList.Remove(channel.Id);
             await Task.CompletedTask;
         }
 
@@ -209,16 +216,41 @@ namespace ShrekBot
             bool onCooldown = _eventCooldown.IsMessageOnCooldown(userid);
             if (onCooldown)
                 return hollerNHoot;//return status; //on cooldown, but don't mark it as cooldown
+            
+            StringBuilder conKey = new StringBuilder();
+            //single thread/core           
+            //ShrekGIFs gifs = new ShrekGIFs();
+            //for (int i = 0; i < gifs.SearchKeys.Length; i++)
+            //{
+            //    string key = gifs.SearchKeys[i];
+            //    int value = Search(key, socketMessage.Content);
+            //    if (value > -1)
+            //        conKey.AppendLine(gifs.GetValue(key));
+            //}
 
-            ShrekGIFs gifs = new ShrekGIFs();
-            for (int i = 0; i < gifs.SearchKeys.Length; i++)
-            {
-                string key = gifs.SearchKeys[i];
-                int value = Search(key, socketMessage.Content);
-                if (value > -1)
-                    await socketMessage.Channel.SendMessageAsync(gifs.GetValue(key));
-            }
+
+            ConcurrentBag<string> keys = ParallelGIFSearch(socketMessage.Content);
+
+            foreach (string item in keys)
+                conKey.AppendLine(item);
+
+            if (conKey.Length > 0)
+                await socketMessage.Channel.SendMessageAsync(conKey.ToString());
             return hollerNHoot;
+        }
+
+        private ConcurrentBag<string> ParallelGIFSearch(string messageContent)
+        {
+            ConcurrentBag<string> values = new ConcurrentBag<string>();
+            ShrekGIFs gifs = new ShrekGIFs();
+            Parallel.ForEach(gifs.SearchKeys, searchKey =>
+            {
+                int value = Search(searchKey, messageContent);
+                if (value > -1)
+                    values.Add(gifs.GetValue(searchKey));
+            });
+
+            return values;
         }
 
         private async Task<DDDReply> PictureRecieved(SocketMessage socketMessage)
@@ -425,7 +457,7 @@ namespace ShrekBot
                     
             }
 
-            if (_textChannelWhiteList.ContainsId(socketMessage.Channel.Id))
+            if (TextChannelWhiteList.ContainsId(socketMessage.Channel.Id))
             {
                 if (!string.IsNullOrEmpty(socketMessage.Content)) //this stays because the user may not send any text
                 {
@@ -444,7 +476,7 @@ namespace ShrekBot
 
         private Task _client_Log(LogMessage arg)
         {
-            //_lavaNode.OnLog += arg;
+            //_lavaNode.OnLog += arg; 
             Console.WriteLine(arg.Message /*+ " " + DateTime.Now*/);
             return Task.CompletedTask;
         }

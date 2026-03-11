@@ -62,6 +62,15 @@ namespace ShrekBot.Modules.Data_Files_and_Management.Database
             }
         }
 
+        internal string GetFriendName(ulong discorduserId)
+        {
+            using (IDbConnection connection = new SQLiteConnection(_connectionString))
+            {
+                string sql = $"SELECT username FROM Discord_Users WHERE user_id = {discorduserId} LIMIT 1";
+                return connection.Query<string>(sql, null, null, true, _DBTimeoutSec).ToArray()[0];
+            }
+        }
+
         /// <summary>
         /// Adds new member of Drake's Server into the database
         /// </summary>

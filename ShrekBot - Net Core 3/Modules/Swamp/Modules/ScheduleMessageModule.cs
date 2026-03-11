@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using ShrekBot.Modules.Swamp.Helpers;
 using ShrekBot.Modules.Swamp.Services;
 using System;
 using System.Globalization;
@@ -52,16 +53,31 @@ namespace ShrekBot.Modules.Swamp.Modules
 
         [Command("setchannel")]
         [Alias("set")]
-        public async Task SetTextChannel(ulong id)
+        public async Task SetTextChannel(string idStr = "")
         {
+            const string BadResponse = "DONKEY!! WHERE IS MY SWAMP!?";
+            if(string.IsNullOrEmpty(idStr))
+            {
+                await ReplyAsync(BadResponse);
+                _service.SetTextChannel(); //default
+                return;
+            }
+            ulong id = Utilities.CheckAndConvertUInt(idStr);
+            if (id == 0)
+            {
+                await ReplyAsync(BadResponse);
+                _service.SetTextChannel(); //default
+                return;
+            }
+                
             _service.SetTextChannel(id);
             SocketChannel textChannel = Context.Client.GetChannel(_service.GuildChnlID);
             if (textChannel != null)
                 await ReplyAsync($"What!? My swamp's been moved to {textChannel}!?");
             else
             {
-                await ReplyAsync("DONKEY!! WHERE IS MY SWAMP!?");
-                _service.SetTextChannel();
+                await ReplyAsync(BadResponse);
+                _service.SetTextChannel(); //
             }
                 
         }

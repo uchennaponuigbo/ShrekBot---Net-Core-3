@@ -30,14 +30,16 @@ namespace ShrekBot.Modules.Swamp.Services
         public TimerService(DiscordSocketClient client)
         {
             SetTextChannel();
-            isPaused = false;
+            //isPaused = false;
             //StartingMessageInMinutes = 1; // 4) Time that message should fire after the timer is created
             //RepeatingMessageInMinutes = 1; //const int Repeating = 24 * 60;
             //Start = DateTime.UtcNow.TimeOfDay.TotalMinutes; End = 24 * 60;
 
             //SetMessageTimes(1, DateTime.UtcNow.Add(new TimeSpan(0,1,0)).ToString("h:mm tt"));
             //SetMessageTimes(1440 * 2, DateTime.UtcNow.Add(new TimeSpan(0, 1, 0)).ToString("h:mm tt"));
-            SetMessageTimes(1.0);
+            //SetMessageTimes(1.0);
+            StartingMessageInMinutes = 1.0;
+            RepeatingMessageInMinutes = 10.0;
 
             Random rand = new Random();
             _timer = new Timer(async _ =>
@@ -54,8 +56,8 @@ namespace ShrekBot.Modules.Swamp.Services
                 //MessageSentDateTime.AddMinutes(RepeatingMessageInMinutes); //adjustments...
                 //_hour = MessageSentDateTime.Hour;
                 //_minute = MessageSentDateTime.Minute;
-                AssignNewDateToUTC();
-                StartingMessageInMinutes = MinutesUntilNextMessage(); //added this here, will do more work tommorow
+                //AssignNewDateToUTC();
+                //StartingMessageInMinutes = MinutesUntilNextMessage(); //added this here, will do more work tommorow
             },
             null,
             TimeSpan.FromMinutes(StartingMessageInMinutes), //
