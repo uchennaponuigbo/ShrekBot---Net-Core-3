@@ -34,17 +34,52 @@ namespace ShrekBot.Modules.Swamp.Modules
         [RequireOwner]
         public async Task OwnerHelp()
         {
-            EmbedBuilder builder = SetUpEmbedBuilder("Shrek's Hidden Onion Vault");
+           // EmbedBuilder builder = SetUpEmbedBuilder("Shrek's Hidden Onion Vault");
             List<CommandInfo> ownerOnlyCommands = new List<CommandInfo>();
             List<CommandInfo> userOnlyCommands = new List<CommandInfo>();
-
             SearchAllCommands(_commands.Modules.Where(m => m.Parent == null), 
-                ref ownerOnlyCommands, ref userOnlyCommands); 
+                ref ownerOnlyCommands, ref userOnlyCommands);
 
-            foreach (CommandInfo item in ownerOnlyCommands)
-                AddEmbedBuilderFields(item, ref builder);
+            //wish I saved the original stackoverflow post of this line of code. I don't remember where it is now
+            int pageCount = (ownerOnlyCommands.Count % 10) == 0 ? ownerOnlyCommands.Count / 10 :
+                (((ownerOnlyCommands.Count + 9) / 10) * 10) / 10; //divides and partitions in sets of 10
+            
+            EmbedBuilder[] builder = new EmbedBuilder[pageCount];
+            SetUpEmbedBuilder(ref builder[0], "Shrek's Hidden Onion Vault");
+            int n = 0;
+            int i = 0;
+            while (n < ownerOnlyCommands.Count)
+            {
+                //i % 10 == 0
+                AddEmbedBuilderFields(ownerOnlyCommands[n], ref builder[i]);
+                n++;
+                if (n % 10 == 0 && n != ownerOnlyCommands.Count) //handles case where last index is divisible by 10,
+                                                                 //which creates the next partition out of bounds
+                {
+                    i++;
+                    SetUpEmbedBuilder(ref builder[i], $"Shrek's Hidden Onion Vault Pt. {i + 1}");
+                }
+                    
+            }
+            //for(int i = 0; i < ownerOnlyCommands.Count; i++)
+            //{
+            //    for(int j = 0 + multiplier; j < )
+            //}
 
-            await ReplyAsync("", false, builder.Build());
+
+
+            //foreach (CommandInfo item in ownerOnlyCommands)
+            //    AddEmbedBuilderFields(item, ref builder);
+
+
+            //await ReplyAsync("", false, builder.Build());
+
+            foreach(var item in builder)
+            {
+                await ReplyAsync("", false, item.Build());
+                await Task.Delay(500);
+            }
+                
         }
 
         [Command("help", RunMode = RunMode.Async)]
@@ -61,7 +96,6 @@ namespace ShrekBot.Modules.Swamp.Modules
 
             foreach (CommandInfo item in userCommands)
                 AddEmbedBuilderFields(item, ref builder);
-
             await ReplyAsync("", false, builder.Build());
         }
 
@@ -74,6 +108,17 @@ namespace ShrekBot.Modules.Swamp.Modules
         private EmbedBuilder SetUpEmbedBuilder(string title)
         {
             return new EmbedBuilder()
+            {
+                Title = title,
+                Color = Color.DarkBlue,
+                Footer = new EmbedFooterBuilder()
+                .WithText("Note: <A value MUST in be here> | [A value in here is optional]")
+            };
+        }
+
+        private void SetUpEmbedBuilder(ref EmbedBuilder builder, string title)
+        {
+            builder = new EmbedBuilder()
             {
                 Title = title,
                 Color = Color.DarkBlue,

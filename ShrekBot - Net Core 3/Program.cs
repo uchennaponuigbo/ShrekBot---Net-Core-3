@@ -176,6 +176,20 @@ namespace ShrekBot
             return text.IndexOf(pattern, 0, StringComparison.CurrentCultureIgnoreCase);
         }
 
+        private ConcurrentBag<string> ParallelGIFSearch(string messageContent)
+        {
+            ConcurrentBag<string> values = new ConcurrentBag<string>();
+            ShrekGIFs gifs = new ShrekGIFs();
+            Parallel.ForEach(ShrekGIFs.SearchKeys, searchKey =>
+            {
+                int value = Search(searchKey, messageContent);
+                if (value > -1)
+                    values.Add(gifs.GetValue(searchKey));
+            });
+
+            return values;
+        }
+
         //https://stackoverflow.com/a/16665247/9521550
         private async Task<DDDReply>TextRecieved(SocketMessage socketMessage)
         {
@@ -237,20 +251,6 @@ namespace ShrekBot
             if (conKey.Length > 0)
                 await socketMessage.Channel.SendMessageAsync(conKey.ToString());
             return hollerNHoot;
-        }
-
-        private ConcurrentBag<string> ParallelGIFSearch(string messageContent)
-        {
-            ConcurrentBag<string> values = new ConcurrentBag<string>();
-            ShrekGIFs gifs = new ShrekGIFs();
-            Parallel.ForEach(gifs.SearchKeys, searchKey =>
-            {
-                int value = Search(searchKey, messageContent);
-                if (value > -1)
-                    values.Add(gifs.GetValue(searchKey));
-            });
-
-            return values;
         }
 
         private async Task<DDDReply> PictureRecieved(SocketMessage socketMessage)

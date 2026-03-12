@@ -43,22 +43,22 @@ namespace ShrekBot.Modules.Swamp.Modules
         [Command("shrek", RunMode = RunMode.Async)]
         [Alias("all", "star", "allstar")]
         [RequireContext(ContextType.Guild)]
-        [RequireOwner] //for now...
         [Summary("Shrek's Theme. (It could take a few seconds for the song to play)")]
         public async Task PlayAllStarAsync(IVoiceChannel channel = null)
         {
             ShrekSongs song = new ShrekSongs();
+            await ReplyAsync("I WOULD play Shrek's theme BUT...");
             //await _audio.ConnectAndPlay(Context, song.GetValue("allstar"));
         }
 
         [Command("shrek2", RunMode = RunMode.Async)]
         [Alias("hero")]
         [RequireContext(ContextType.Guild)]
-        [RequireOwner] //for now...
         [Summary("I need a Hero. (It could take a few seconds for the song to play)")]
         public async Task PlayHeroAsync(IVoiceChannel channel = null)
         {
             ShrekSongs song = new ShrekSongs();
+            await ReplyAsync("I need a hero... OR RATHER, I WANT TO PLAY HERO");
             //await _audio.ConnectAndPlay(Context, song.GetValue("hero"));
         }
     }

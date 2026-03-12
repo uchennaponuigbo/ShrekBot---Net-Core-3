@@ -90,7 +90,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management
             SaveDataToFile();
         }
 
-        public void AddValue(string name, string value)
+        public virtual void AddValue(string name, string value)
         {
             pairs.Add(name, value);
             SaveDataToFile();

@@ -18,10 +18,20 @@
             return $"{Anger}{base.GetValue(key)}{Anger}";
         }
 
-        public void AddQuote(string value)
+        //public void AddQuote(string value)
+        //{
+        //    pairs.Add($"{pairs.Count + 1}", value);
+        //    SaveDataToFile();
+        //}
+
+        /// <summary>
+        /// Adds new quote. Ordered numerically. Uses one parameter to respect polymorphism
+        /// </summary>
+        /// <param name="name">Don't bother putting anything here. It won't go anywhere</param>
+        /// <param name="value"></param>
+        public override void AddValue(string value, string name = "")
         {
-            pairs.Add($"{pairs.Count + 1}", value);
-            SaveDataToFile();
+            base.AddValue($"{pairs.Count + 1}", value);
         }
     }
 }

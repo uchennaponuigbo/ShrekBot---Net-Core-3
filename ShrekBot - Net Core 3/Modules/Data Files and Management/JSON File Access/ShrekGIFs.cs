@@ -12,7 +12,7 @@ namespace ShrekBot.Modules.Data_Files_and_Management
 {
     public sealed class ShrekGIFs : JSONManagement
     {
-        public string[] SearchKeys { get; private set; }
+        public static string[] SearchKeys { get; private set; }
         public ShrekGIFs() : base() 
         {           
             Initialize(@"..\gifs.json", "gifs.json");
@@ -21,14 +21,14 @@ namespace ShrekBot.Modules.Data_Files_and_Management
             SearchKeys = GetKeys().ToArray();
         }
 
-        //static ShrekGIFs()
-        //{
-        //    using (StreamReader sr = File.OpenText(@"..\gifs.json"))
-        //    using (JsonTextReader reader = new JsonTextReader(sr))
-        //    {
-        //        JObject json = (JObject)JToken.ReadFrom(reader);
-        //        SearchKeys = json.Properties().Select(p => p.Name).ToArray();
-        //    }
-        //}
+        static ShrekGIFs()
+        {
+            using (StreamReader sr = File.OpenText(@"..\gifs.json"))
+            using (JsonTextReader reader = new JsonTextReader(sr))
+            {
+                JObject json = (JObject)JToken.ReadFrom(reader);
+                SearchKeys = json.Properties().Select(p => p.Name).ToArray();
+            }
+        }
     }
 }

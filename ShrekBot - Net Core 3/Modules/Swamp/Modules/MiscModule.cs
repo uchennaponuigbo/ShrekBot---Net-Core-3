@@ -87,7 +87,7 @@ namespace ShrekBot.Modules.Swamp.Modules
 
                 ShrekMessage swamp = new ShrekMessage();
 
-                swamp.AddQuote(newQuote);
+                swamp.AddValue(newQuote);
                 EmbedBuilder build = new EmbedBuilder();
 
                 build.Title = "New quote added and saved!";
