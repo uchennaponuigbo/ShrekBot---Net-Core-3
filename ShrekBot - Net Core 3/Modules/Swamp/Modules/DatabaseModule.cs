@@ -373,254 +373,254 @@ namespace ShrekBot.Modules.Swamp.Modules
             //        }
             //        EmbedBuilder build = new EmbedBuilder();
             //    }
-            //}
+            //}           
+        }
 
-            [Group("iv")]
-            [Alias("IV")]
-            [Summary("Manages the internal dictionaries used for checking certain media hashes")]
-            [Remarks("'iv' is short for for ImageVideo")]
-            [RequireOwner]
-            public class ManageInternalHashes : ModuleBase<SocketCommandContext>
+        [Group("iv")]
+        [Alias("IV")]
+        [Summary("Manages the internal dictionaries used for checking certain media hashes")]
+        [Remarks("'iv' is short for for ImageVideo")]
+        [RequireOwner]
+        public class ManageInternalHashes : ModuleBase<SocketCommandContext>
+        {
+            private async Task PrintToTextFile(SocketCommandContext context, string message, string filename)
+            {//https://www.w3tutorials.net/blog/memorystream-cannot-access-a-closed-stream/
+                StreamWriter sw = null;
+                try
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        sw = new StreamWriter(ms);
+                        sw.Write(message);
+                        sw.Flush();
+                        ms.Position = 0;
+
+                        await Context.Channel.SendFileAsync(ms, filename);
+
+                    }
+                }
+                finally
+                {
+                    if (sw != null)
+                        sw.Dispose();
+                }
+            }
+
+            [Command("addabomn", RunMode = RunMode.Async)]
+            [Alias("aa", "aadd")]
+            [Summary("The blacklist used to see if this is an abomination image")]
+            public async Task AddAbominationVariant(string name = "", string abominationHashVariant = "")
             {
-                private async Task PrintToTextFile(SocketCommandContext context, string message, string filename)
-                {//https://www.w3tutorials.net/blog/memorystream-cannot-access-a-closed-stream/
-                    StreamWriter sw = null;
-                    try
-                    {
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            sw = new StreamWriter(ms);
-                            sw.Write(message);
-                            sw.Flush();
-                            ms.Position = 0;
-
-                            await Context.Channel.SendFileAsync(ms, filename);
-
-                        }
-                    }
-                    finally
-                    {
-                        if (sw != null)
-                            sw.Dispose();
-                    }
-                }
-
-                [Command("addabomn", RunMode = RunMode.Async)]
-                [Alias("aa", "aadd")]
-                [Summary("The blacklist used to see if this is an abomination image")]
-                public async Task AddAbominationVariant(string name = "", string abominationHashVariant = "")
+                if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(abominationHashVariant))
                 {
-                    if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(abominationHashVariant))
-                    {
-                        await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
-                        return;
-                    }
-                    ulong abominationHashVariantConvert = Utilities.CheckAndConvertUInt(abominationHashVariant);
-                    if (abominationHashVariantConvert == 0)
-                    {
-                        await ReplyAsync("Donkey, you can't give me nothing or garbage!");
-                        return;
-                    }
-                    ImageComparison comparison = new ImageComparison();
-                    int recordsRemoved = comparison.AddAbominationVariant(abominationHashVariantConvert, name);
-                    string message = "";
-                    if (recordsRemoved > 0)
-                        message = $"Donkey, {recordsRemoved} sneaky rat(s) got past me into the Swamp! I killed it though so I'll keep watch!";
-                    else
-                        message = "I'll keep watch of this new Onion rat!";
-                    await ReplyAsync(message);
+                    await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
+                    return;
                 }
-
-                [Command("removeabomn", RunMode = RunMode.Async)]
-                [Alias("ra", "rab")]
-                [Remarks("If I call this function, then I'm the foolish one for making an earlier mistake")]
-                public async Task RemoveAbominationVariant(string abominationHashVariant = "")
+                ulong abominationHashVariantConvert = Utilities.CheckAndConvertUInt(abominationHashVariant);
+                if (abominationHashVariantConvert == 0)
                 {
-                    if (string.IsNullOrEmpty(abominationHashVariant))
-                    {
-                        await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
-                        return;
-                    }
-
-                    ulong abominationHashVariantConvert = Utilities.CheckAndConvertUInt(abominationHashVariant);
-                    if (abominationHashVariantConvert == 0)
-                    {
-                        await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
-                        return;
-                    }
-                    ImageComparison comparison = new ImageComparison();
-                    bool removed = comparison.RemoveAbominationVariant(abominationHashVariantConvert);
-                    string message = "";
-                    if (removed)
-                        message = $"Donkey, I firmly believe you have too much onions in your eyes, but fine! I GUESS this is not a rat!";
-                    else
-                        message = "Oopsy, I can't unsee a rat heheh!";
-                    await ReplyAsync(message);
+                    await ReplyAsync("Donkey, you can't give me nothing or garbage!");
+                    return;
                 }
+                ImageComparison comparison = new ImageComparison();
+                int recordsRemoved = comparison.AddAbominationVariant(abominationHashVariantConvert, name);
+                string message = "";
+                if (recordsRemoved > 0)
+                    message = $"Donkey, {recordsRemoved} sneaky rat(s) got past me into the Swamp! I killed it though so I'll keep watch!";
+                else
+                    message = "I'll keep watch of this new Onion rat!";
+                await ReplyAsync(message);
+            }
 
-                [Command("printabomn", RunMode = RunMode.Async)]
-                [Alias("printabomn", "pa")]
-                [Summary("The list of abominations that Drake may try to circumvent")]
-                public async Task PrintAbominationHashesAndNames()
+            [Command("removeabomn", RunMode = RunMode.Async)]
+            [Alias("ra", "rab")]
+            [Remarks("If I call this function, then I'm the foolish one for making an earlier mistake")]
+            public async Task RemoveAbominationVariant(string abominationHashVariant = "")
+            {
+                if (string.IsNullOrEmpty(abominationHashVariant))
                 {
-                    ImageComparison comparison = new ImageComparison();
-                    string garbage = comparison.GetAbominationKeysAndNames();
-                    if (garbage.Length > 2000) //I don't care if the string looks weird here, and if I really wanted to, I could split with the split function
-                    {
-                        //await ReplyAsync(garbage.Substring(0, 1000));
-                        //await Task.Delay(1);
-                        //await ReplyAsync(garbage.Substring(1001, 2000));
-                        await PrintToTextFile(Context, garbage, "Abomination Hashes.txt");
-                    }
-                    else
-                        await ReplyAsync(garbage);
+                    await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
+                    return;
                 }
 
-                [Command("addexempt", RunMode = RunMode.Async)]
-                [Alias("ae")]
-                [Summary("Images that are not to be added to database")]
-                public async Task AddExemptImageHash(string name = "", string exemptHash = "")
+                ulong abominationHashVariantConvert = Utilities.CheckAndConvertUInt(abominationHashVariant);
+                if (abominationHashVariantConvert == 0)
                 {
-                    if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(exemptHash))
-                    {
-                        await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
-                        return;
-                    }
-                    ulong exemptHashConvert = Utilities.CheckAndConvertUInt(exemptHash);
-                    if (exemptHashConvert == 0)
-                    {
-                        await ReplyAsync("Donkey, you can't give me nothing or garbage!");
-                        return;
-                    }
-
-                    ImageComparison comparison = new ImageComparison();
-                    int recordsRemoved = comparison.AddExemptHash(exemptHashConvert, name);
-                    string message = "";
-                    if (recordsRemoved > 0)
-                        message = $"Donkey, how did you mistake {recordsRemoved} non-rat(s) AS rat(s). I don't mind 'em, but they shouldn't be here!";
-                    else
-                        message = "Okay, a new non-rat not to be entered into my Swamp!";
-                    await ReplyAsync(message);
+                    await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
+                    return;
                 }
+                ImageComparison comparison = new ImageComparison();
+                bool removed = comparison.RemoveAbominationVariant(abominationHashVariantConvert);
+                string message = "";
+                if (removed)
+                    message = $"Donkey, I firmly believe you have too much onions in your eyes, but fine! I GUESS this is not a rat!";
+                else
+                    message = "Oopsy, I can't unsee a rat heheh!";
+                await ReplyAsync(message);
+            }
 
-                [Command("removeexempt", RunMode = RunMode.Async)]
-                [Alias("re")]
-                [Remarks("It's unlikely that I'll call this method as well, if I know that certain reaction images will not be added")]
-                public async Task RemoveExemptImageHash(string exemptHash = "")
+            [Command("printabomn", RunMode = RunMode.Async)]
+            [Alias("printabomn", "pa")]
+            [Summary("The list of abominations that Drake may try to circumvent")]
+            public async Task PrintAbominationHashesAndNames()
+            {
+                ImageComparison comparison = new ImageComparison();
+                string garbage = comparison.GetAbominationKeysAndNames();
+                if (garbage.Length > 2000) //I don't care if the string looks weird here, and if I really wanted to, I could split with the split function
                 {
-                    if (string.IsNullOrEmpty(exemptHash))
-                    {
-                        await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
-                        return;
-                    }
-
-                    ulong exemptHashConvert = Utilities.CheckAndConvertUInt(exemptHash);
-                    if (exemptHashConvert == 0)
-                    {
-                        await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
-                        return;
-                    }
-                    ImageComparison comparison = new ImageComparison();
-                    bool removed = comparison.RemoveExemptHash(exemptHashConvert);
-                    string message = "";
-                    if (removed)
-                        message = $"So what you're saying Donkey is that this is an actual rat to keep out ehh?!";
-                    else
-                        message = "Oopsy, I can't unsee a NON-rat heheh!";
-                    await ReplyAsync(message);
+                    //await ReplyAsync(garbage.Substring(0, 1000));
+                    //await Task.Delay(1);
+                    //await ReplyAsync(garbage.Substring(1001, 2000));
+                    await PrintToTextFile(Context, garbage, "Abomination Hashes.txt");
                 }
+                else
+                    await ReplyAsync(garbage);
+            }
 
-                [Command("printexempt", RunMode = RunMode.Async)]
-                [Alias("pe")]
-                [Summary("The list of exempt images that should not be inserted into database")]
-                public async Task PrintExemptImageHashes()
+            [Command("addexempt", RunMode = RunMode.Async)]
+            [Alias("ae")]
+            [Summary("Images that are not to be added to database")]
+            public async Task AddExemptImageHash(string name = "", string exemptHash = "")
+            {
+                if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(exemptHash))
                 {
-                    ImageComparison comparison = new ImageComparison();
-                    string trash = comparison.GetExemptKeysAndNames();
-                    if (trash.Length > 2000)
-                    {
-                        await PrintToTextFile(Context, trash, "Exempt Hashes.txt");
-                    }
-                    else
-                        await ReplyAsync(trash);
+                    await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
+                    return;
                 }
-
-                [Command("addfalse", RunMode = RunMode.Async)]
-                [Alias("af")]
-                [Remarks("Use after visually verifying the false positive is in fact, a false positive")]
-                public async Task AddFalsePositiveImageHash(string name = "", string falsePositiveHash = "")
+                ulong exemptHashConvert = Utilities.CheckAndConvertUInt(exemptHash);
+                if (exemptHashConvert == 0)
                 {
-                    if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(falsePositiveHash))
-                    {
-                        await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
-                        return;
-                    }
-                    ulong falsePositiveHashConvert = Utilities.CheckAndConvertUInt(falsePositiveHash);
-                    if (falsePositiveHashConvert == 0)
-                    {
-                        await ReplyAsync("Donkey, you can't give me nothing or garbage!");
-                        return;
-                    }
-
-                    ImageComparison comparison = new ImageComparison();
-                    comparison.AddFalsePositive(falsePositiveHashConvert, name);
-                    await ReplyAsync("So what you're saying is that this is NOT a rat? Got it!");
+                    await ReplyAsync("Donkey, you can't give me nothing or garbage!");
+                    return;
                 }
 
-                [Command("removefalse", RunMode = RunMode.Async)]
-                [Alias("rf")]
-                [Remarks("As usually, it's very unlikely that this function will be called after checking that it is not an abomination")]
-                public async Task RemoveFalsePositiveImageHash(string falsePostiveHash = "")
+                ImageComparison comparison = new ImageComparison();
+                int recordsRemoved = comparison.AddExemptHash(exemptHashConvert, name);
+                string message = "";
+                if (recordsRemoved > 0)
+                    message = $"Donkey, how did you mistake {recordsRemoved} non-rat(s) AS rat(s). I don't mind 'em, but they shouldn't be here!";
+                else
+                    message = "Okay, a new non-rat not to be entered into my Swamp!";
+                await ReplyAsync(message);
+            }
+
+            [Command("removeexempt", RunMode = RunMode.Async)]
+            [Alias("re")]
+            [Remarks("It's unlikely that I'll call this method as well, if I know that certain reaction images will not be added")]
+            public async Task RemoveExemptImageHash(string exemptHash = "")
+            {
+                if (string.IsNullOrEmpty(exemptHash))
                 {
-                    if (string.IsNullOrEmpty(falsePostiveHash))
-                    {
-                        await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
-                        return;
-                    }
-
-                    ulong falsePositiveHashConvert = Utilities.CheckAndConvertUInt(falsePostiveHash);
-                    if (falsePositiveHashConvert == 0)
-                    {
-                        await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
-                        return;
-                    }
-
-                    ImageComparison comparison = new ImageComparison();
-                    bool removed = comparison.RemoveFalsePositiveHash(falsePositiveHashConvert);
-                    string message = "";
-                    if (removed)
-                        message = $"Hold up. THAT WAS A RAT ALL ALONG!? DONKEY, YOU--";
-                    else
-                        message = "What are you doing? This is fine, I think!";
-                    await ReplyAsync(message);
+                    await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
+                    return;
                 }
 
-                [Command("printfalse", RunMode = RunMode.Async)]
-                [Alias("pf")]
-                [Summary("The list of false positives that can be inserted into database")]
-                public async Task PrintFalsePositiveImageHashes()
+                ulong exemptHashConvert = Utilities.CheckAndConvertUInt(exemptHash);
+                if (exemptHashConvert == 0)
                 {
-                    ImageComparison comparison = new ImageComparison();
-                    string filth = comparison.GetFalsePositiveKeysAndNames();
-                    if (filth.Length > 2000)
-                    {
-                        //using (MemoryStream ms = new MemoryStream())
-                        //{
-                        //    using (StreamWriter outputFile = new StreamWriter(ms))
-                        //    {
-                        //        ms.Position = 0;
-                        //        outputFile.Write(filth);
-                        //        //FileAttachment attachment = new FileAttachment(outputFile)
-                        //        //using(FileStream fs = new FileStream())
-                        //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
-
-                        //    }
-                        //}
-                        await PrintToTextFile(Context, filth, "False Positives.txt");
-                    }
-                    else
-                        await ReplyAsync(filth);
+                    await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
+                    return;
                 }
+                ImageComparison comparison = new ImageComparison();
+                bool removed = comparison.RemoveExemptHash(exemptHashConvert);
+                string message = "";
+                if (removed)
+                    message = $"So what you're saying Donkey is that this is an actual rat to keep out ehh?!";
+                else
+                    message = "Oopsy, I can't unsee a NON-rat heheh!";
+                await ReplyAsync(message);
+            }
+
+            [Command("printexempt", RunMode = RunMode.Async)]
+            [Alias("pe")]
+            [Summary("The list of exempt images that should not be inserted into database")]
+            public async Task PrintExemptImageHashes()
+            {
+                ImageComparison comparison = new ImageComparison();
+                string trash = comparison.GetExemptKeysAndNames();
+                if (trash.Length > 2000)
+                {
+                    await PrintToTextFile(Context, trash, "Exempt Hashes.txt");
+                }
+                else
+                    await ReplyAsync(trash);
+            }
+
+            [Command("addfalse", RunMode = RunMode.Async)]
+            [Alias("af")]
+            [Remarks("Use after visually verifying the false positive is in fact, a false positive")]
+            public async Task AddFalsePositiveImageHash(string name = "", string falsePositiveHash = "")
+            {
+                if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(falsePositiveHash))
+                {
+                    await ReplyAsync("Donkey, give me something better than that! I need TWO good stuff. A name and the hash!");
+                    return;
+                }
+                ulong falsePositiveHashConvert = Utilities.CheckAndConvertUInt(falsePositiveHash);
+                if (falsePositiveHashConvert == 0)
+                {
+                    await ReplyAsync("Donkey, you can't give me nothing or garbage!");
+                    return;
+                }
+
+                ImageComparison comparison = new ImageComparison();
+                comparison.AddFalsePositive(falsePositiveHashConvert, name);
+                await ReplyAsync("So what you're saying is that this is NOT a rat? Got it!");
+            }
+
+            [Command("removefalse", RunMode = RunMode.Async)]
+            [Alias("rf")]
+            [Remarks("As usually, it's very unlikely that this function will be called after checking that it is not an abomination")]
+            public async Task RemoveFalsePositiveImageHash(string falsePostiveHash = "")
+            {
+                if (string.IsNullOrEmpty(falsePostiveHash))
+                {
+                    await ReplyAsync("Donkey, ya give me something better than that! Where's the hash!?");
+                    return;
+                }
+
+                ulong falsePositiveHashConvert = Utilities.CheckAndConvertUInt(falsePostiveHash);
+                if (falsePositiveHashConvert == 0)
+                {
+                    await ReplyAsync("Tell me Donkey. What am I removing again? Cuz that ain't the hash!");
+                    return;
+                }
+
+                ImageComparison comparison = new ImageComparison();
+                bool removed = comparison.RemoveFalsePositiveHash(falsePositiveHashConvert);
+                string message = "";
+                if (removed)
+                    message = $"Hold up. THAT WAS A RAT ALL ALONG!? DONKEY, YOU--";
+                else
+                    message = "What are you doing? This is fine, I think!";
+                await ReplyAsync(message);
+            }
+
+            [Command("printfalse", RunMode = RunMode.Async)]
+            [Alias("pf")]
+            [Summary("The list of false positives that can be inserted into database")]
+            public async Task PrintFalsePositiveImageHashes()
+            {
+                ImageComparison comparison = new ImageComparison();
+                string filth = comparison.GetFalsePositiveKeysAndNames();
+                if (filth.Length > 2000)
+                {
+                    //using (MemoryStream ms = new MemoryStream())
+                    //{
+                    //    using (StreamWriter outputFile = new StreamWriter(ms))
+                    //    {
+                    //        ms.Position = 0;
+                    //        outputFile.Write(filth);
+                    //        //FileAttachment attachment = new FileAttachment(outputFile)
+                    //        //using(FileStream fs = new FileStream())
+                    //        await Context.Channel.SendFileAsync(ms, "False Positives.txt");
+
+                    //    }
+                    //}
+                    await PrintToTextFile(Context, filth, "False Positives.txt");
+                }
+                else
+                    await ReplyAsync(filth);
             }
         }
     }

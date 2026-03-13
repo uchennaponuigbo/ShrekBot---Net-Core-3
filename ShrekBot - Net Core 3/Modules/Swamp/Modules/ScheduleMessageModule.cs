@@ -49,13 +49,15 @@ namespace ShrekBot.Modules.Swamp.Modules
             //    $" after that. And after that too!";
 
             //await ReplyAsync(message);
+            await ReplyAsync($"Donkey! I will shout something at {_service.PrintTime()}. " +
+                $"And exactly {_service.RepeatingMessageInMinutes} after that!");
         }
 
         [Command("setchannel")]
         [Alias("set")]
         public async Task SetTextChannel(string idStr = "")
         {
-            const string BadResponse = "DONKEY!! WHERE IS MY SWAMP!?";
+            const string BadResponse = "DONKEY!! WHERE IS MY SWAMP!? Forget it, I'm leading us there!";
             if(string.IsNullOrEmpty(idStr))
             {
                 await ReplyAsync(BadResponse);
@@ -82,30 +84,30 @@ namespace ShrekBot.Modules.Swamp.Modules
                 
         }
 
-        [Command("assignnewtime")]
-        [Alias("newtime", "ant")]
-        public async Task SetTimeInterval(double newRepeatingInterval, /*string newIntervalTimeInUTC*/ int hour, int minute)
-        {
-            //if(newRepeatingInterval < 0)
-            //{
-            //    await ReplyAsync("Donkey! How does a negative repeat time makes sense!!");
-            //    return;
-            //}
+        //[Command("assignnewtime")]
+        //[Alias("newtime", "ant")]
+        //public async Task SetTimeInterval(double newRepeatingInterval, /*string newIntervalTimeInUTC*/ int hour, int minute)
+        //{
+        //    //if(newRepeatingInterval < 0)
+        //    //{
+        //    //    await ReplyAsync("Donkey! How does a negative repeat time makes sense!!");
+        //    //    return;
+        //    //}
                 
-            //if (!IsValidTimeFormat(newIntervalTimeInUTC))
-            //{
-            //    await ReplyAsync("Donkey! What clock on what planet have you been reading!? " +
-            //        "You better not of forgotten the AM/PM too...");
-            //    return;
-            //}
-            ////TODO
-            ////if this format is correct, but it's in the past...
+        //    //if (!IsValidTimeFormat(newIntervalTimeInUTC))
+        //    //{
+        //    //    await ReplyAsync("Donkey! What clock on what planet have you been reading!? " +
+        //    //        "You better not of forgotten the AM/PM too...");
+        //    //    return;
+        //    //}
+        //    ////TODO
+        //    ////if this format is correct, but it's in the past...
 
 
-            //_service.SetMessageTimes(newRepeatingInterval, newIntervalTimeInUTC);
-            //_service.Restart();
-            await ReplyAsync("Fine, Donkey! I will shout my messages at a different time!");
-        }
+        //    //_service.SetMessageTimes(newRepeatingInterval, newIntervalTimeInUTC);
+        //    //_service.Restart();
+        //    await ReplyAsync("Fine, Donkey! I will shout my messages at a different time!");
+        //}
 
         [Command("hosttimezone")]
         [Summary("The timezone the bot is running in, with respect to the time zone the user is running in.")]
@@ -135,11 +137,11 @@ namespace ShrekBot.Modules.Swamp.Modules
             //ReplyAsync(_service.PrintTime())
             double nextMinutes = _service.MinutesUntilNextMessage();
             double repeatMinutes = _service.RepeatingMessageInMinutes;
-            string hourConversion = "";
-            string repeatingHourConversion = "";
+            //string hourConversion = "";
+            //string repeatingHourConversion = "";
 
-            FormatSingularOrPluralMessage(nextMinutes, repeatMinutes,
-                ref hourConversion, ref repeatingHourConversion);
+            //FormatSingularOrPluralMessage(nextMinutes, repeatMinutes,
+            //    ref hourConversion, ref repeatingHourConversion);
 
             //string message = $"I shout the next message every " +
             //    $"{repeatMinutes} minute{(repeatMinutes == 1 ? "" : "s")}{repeatingHourConversion}. " +

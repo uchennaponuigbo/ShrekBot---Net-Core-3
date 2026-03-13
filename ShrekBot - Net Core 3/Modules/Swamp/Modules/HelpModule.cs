@@ -53,7 +53,7 @@ namespace ShrekBot.Modules.Swamp.Modules
                 //i % 10 == 0
                 AddEmbedBuilderFields(ownerOnlyCommands[n], ref builder[i]);
                 n++;
-                if (n % 10 == 0 && n != ownerOnlyCommands.Count) //handles case where last index is divisible by 10,
+                if (n % 10 == 0 && n < ownerOnlyCommands.Count) //handles case where last index is divisible by 10,
                                                                  //which creates the next partition out of bounds
                 {
                     i++;
@@ -61,20 +61,8 @@ namespace ShrekBot.Modules.Swamp.Modules
                 }
                     
             }
-            //for(int i = 0; i < ownerOnlyCommands.Count; i++)
-            //{
-            //    for(int j = 0 + multiplier; j < )
-            //}
 
-
-
-            //foreach (CommandInfo item in ownerOnlyCommands)
-            //    AddEmbedBuilderFields(item, ref builder);
-
-
-            //await ReplyAsync("", false, builder.Build());
-
-            foreach(var item in builder)
+            foreach(EmbedBuilder item in builder)
             {
                 await ReplyAsync("", false, item.Build());
                 await Task.Delay(500);

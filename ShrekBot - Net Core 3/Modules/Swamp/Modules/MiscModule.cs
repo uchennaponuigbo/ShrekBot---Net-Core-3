@@ -5,26 +5,25 @@ using ShrekBot.Modules.Data_Files_and_Management;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace ShrekBot.Modules.Swamp.Modules
 {
     public class MiscModule : ModuleBase<SocketCommandContext>
     {
-        [Command("test")]
-        [RequireOwner]
-        public async Task Test(/*string keyword*/)
-        {
-            //ShrekGIFs gifs = new ShrekGIFs();
-            //await ReplyAsync("<t:1759524196:t>"); //gifs.GetValue("shrek")
-            //DateTime currentTime = DateTime.UtcNow;
-            //long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
-            //await ReplyAsync($"<t:{unixTime}:t>");
+        //[Command("test")]
+        //[RequireOwner]
+        //public async Task Test(/*string keyword*/)
+        //{
+        //    //ShrekGIFs gifs = new ShrekGIFs();
+        //    //await ReplyAsync("<t:1759524196:t>"); //gifs.GetValue("shrek")
+        //    //DateTime currentTime = DateTime.UtcNow;
+        //    //long unixTime = ((DateTimeOffset)currentTime).AddMinutes(1).ToUnixTimeSeconds();
+        //    //await ReplyAsync($"<t:{unixTime}:t>");
 
-            await ReplyAsync("https://tenor.com/view/abell46s-reface-shrek-ilucion-optica-screaming-gif-19071434 " +
-                "https://tenor.com/view/shrek-mud-shower-shrek-mud-shower-shrek-shower-gif-22792672");
+        //    await ReplyAsync("https://tenor.com/view/abell46s-reface-shrek-ilucion-optica-screaming-gif-19071434 " +
+        //        "https://tenor.com/view/shrek-mud-shower-shrek-mud-shower-shrek-shower-gif-22792672");
 
-        }
+        //}
 
         //<t:1759524231:f>  //current date and time
         //"<t:1759524196:t>" //current time
@@ -148,9 +147,5 @@ namespace ShrekBot.Modules.Swamp.Modules
             await dmChannel.SendMessageAsync(s);
             Environment.Exit(0);
         }
-
-
-        //commands to add and remove channels to white list
-        //if parameters are empty, then the current channel this command is involked will be added to whitelist
     }
 }
